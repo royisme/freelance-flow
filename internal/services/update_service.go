@@ -1,3 +1,4 @@
+// Package services contains backend service implementations used by the app.
 package services
 
 import (
@@ -14,14 +15,16 @@ import (
 )
 
 const (
+	// RepoOwner identifies the GitHub account hosting releases.
 	RepoOwner = "royzhu"
-	RepoName  = "freelance-flow"
+	// RepoName identifies the GitHub repository hosting releases.
+	RepoName = "freelance-flow"
 )
 
 // UpdateService handles application updates.
 type UpdateService struct {
 	ctx            context.Context
-	state          update.UpdateState
+	state          update.State
 	mu             sync.RWMutex
 	_              int // hours, unused for now (checkInterval)
 	downloader     *update.Downloader
@@ -31,8 +34,8 @@ type UpdateService struct {
 // NewUpdateService creates a new UpdateService.
 func NewUpdateService() *UpdateService {
 	return &UpdateService{
-		state: update.UpdateState{
-			Status:         update.UpdateStatusNone,
+		state: update.State{
+			Status:         update.StatusNone,
 			CurrentVersion: update.GetCurrentVersion(),
 		},
 		downloader: update.NewDownloader(),
@@ -40,6 +43,8 @@ func NewUpdateService() *UpdateService {
 }
 
 // startup is called by Wails when the application starts.
+//
+//nolint:unused // Called by Wails runtime via reflection.
 func (s *UpdateService) startup(ctx context.Context) {
 	s.ctx = ctx
 	// Auto-check on startup
@@ -52,7 +57,7 @@ func (s *UpdateService) startup(ctx context.Context) {
 func (s *UpdateService) CheckForUpdate() error {
 	s.mu.Lock()
 	// If already downloading or ready, don't check again to avoid overwriting state
-	if s.state.Status == update.UpdateStatusDownloading || s.state.Status == update.UpdateStatusReady {
+	if s.state.Status == update.StatusDownloading || s.state.Status == update.StatusReady {
 		s.mu.Unlock()
 		return nil
 	}
@@ -63,7 +68,7 @@ func (s *UpdateService) CheckForUpdate() error {
 		// If 404, it means no release found, which is fine.
 		if contains404(err) {
 			s.mu.Lock()
-			s.state.Status = update.UpdateStatusNone
+			s.state.Status = update.StatusNone
 			s.state.Error = ""
 			s.mu.Unlock()
 			s.emitState()
@@ -83,12 +88,12 @@ func (s *UpdateService) CheckForUpdate() error {
 	defer s.mu.Unlock()
 
 	if available {
-		s.state.Status = update.UpdateStatusAvailable
+		s.state.Status = update.StatusAvailable
 		s.state.LatestVersion = latest.Version
 		s.state.UpdateInfo = latest
 		s.state.Error = ""
 	} else {
-		s.state.Status = update.UpdateStatusNone
+		s.state.Status = update.StatusNone
 		// Keep current info but marked as none? Or clear?
 		// Let's keep it clean
 		s.state.LatestVersion = latest.Version // Still useful to know
@@ -101,7 +106,7 @@ func (s *UpdateService) CheckForUpdate() error {
 // StartDownload starts downloading the update for the current platform.
 func (s *UpdateService) StartDownload() error {
 	s.mu.Lock()
-	if s.state.Status != update.UpdateStatusAvailable {
+	if s.state.Status != update.StatusAvailable {
 		s.mu.Unlock()
 		return fmt.Errorf("no update available to download")
 	}
@@ -116,7 +121,7 @@ func (s *UpdateService) StartDownload() error {
 		return fmt.Errorf("%s", errMsg)
 	}
 
-	s.state.Status = update.UpdateStatusDownloading
+	s.state.Status = update.StatusDownloading
 	s.emitState()
 
 	// Setup cancellation
@@ -145,11 +150,11 @@ func (s *UpdateService) StartDownload() error {
 
 		if err != nil {
 			if ctx.Err() == context.Canceled {
-				s.state.Status = update.UpdateStatusAvailable // Revert to available
+				s.state.Status = update.StatusAvailable // Revert to available
 				s.emitState()
 				return
 			}
-			s.state.Status = update.UpdateStatusError
+			s.state.Status = update.StatusError
 			s.state.Error = "Download failed: " + err.Error()
 			s.emitState()
 			return
@@ -167,7 +172,7 @@ func (s *UpdateService) StartDownload() error {
 
 		if asset.Signature != "" {
 			if err := s.downloader.VerifyHash(destPath, asset.Signature); err != nil {
-				s.state.Status = update.UpdateStatusError
+				s.state.Status = update.StatusError
 				s.state.Error = "Hash verification failed: " + err.Error()
 				s.emitState()
 				return
@@ -175,7 +180,7 @@ func (s *UpdateService) StartDownload() error {
 		}
 
 		// Success
-		s.state.Status = update.UpdateStatusReady
+		s.state.Status = update.StatusReady
 		// Check where we store the downloaded file path?
 		// We might need to store it in state or accessible field to open it later.
 		// Since UpdateInfo.Platforms is a map, we can't easily modify it to add local path.
@@ -200,7 +205,7 @@ func (s *UpdateService) CancelDownload() {
 // InstallUpdate initiates the installation (opens the file).
 func (s *UpdateService) InstallUpdate() error {
 	s.mu.RLock()
-	if s.state.Status != update.UpdateStatusReady {
+	if s.state.Status != update.StatusReady {
 		s.mu.RUnlock()
 		return fmt.Errorf("update not ready to install")
 	}
@@ -219,8 +224,8 @@ func (s *UpdateService) InstallUpdate() error {
 	destPath := filepath.Join(tempDir, fileName)
 
 	if runtime.GOOS == "darwin" {
-		// Open DMG
-		cmd := exec.Command("open", destPath)
+		// Open DMG; path is derived from TempDir and known asset name.
+		cmd := exec.Command("open", filepath.Clean(destPath)) //nolint:gosec
 		if err := cmd.Start(); err != nil {
 			return fmt.Errorf("failed to open installer: %w", err)
 		}
@@ -236,7 +241,7 @@ func (s *UpdateService) InstallUpdate() error {
 }
 
 // GetUpdateState returns the current update state.
-func (s *UpdateService) GetUpdateState() update.UpdateState {
+func (s *UpdateService) GetUpdateState() update.State {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 	return s.state
@@ -247,9 +252,9 @@ func (s *UpdateService) SkipVersion() {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	if s.state.Status == update.UpdateStatusAvailable || s.state.Status == update.UpdateStatusError {
+	if s.state.Status == update.StatusAvailable || s.state.Status == update.StatusError {
 		// Logic to persist skip choice would go here
-		s.state.Status = update.UpdateStatusNone
+		s.state.Status = update.StatusNone
 		s.emitState()
 	}
 }
@@ -259,7 +264,7 @@ func (s *UpdateService) setError(msg string) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	s.state.Error = msg
-	s.state.Status = update.UpdateStatusError
+	s.state.Status = update.StatusError
 	s.emitState()
 }
 

@@ -1,5 +1,7 @@
+// Package models defines database-backed domain models.
 package models
 
+// Client represents a customer's organization or individual.
 type Client struct {
 	ID            int    `json:"id"`
 	Name          string `json:"name"`

@@ -88,7 +88,7 @@ func (s *AuthService) Register(input dto.RegisterInput) (dto.UserOutput, error) 
 		log.Println("Error preparing insert:", err)
 		return dto.UserOutput{}, err
 	}
-	defer stmt.Close() //nolint:errcheck
+	defer closeWithLog(stmt, "closing register statement")
 
 	now := time.Now()
 	res, err := stmt.Exec(userUUID, input.Username, passwordHash, input.Email, input.AvatarURL, settingsJSON, now.Format(time.RFC3339), now.Format(time.RFC3339))
@@ -164,7 +164,7 @@ func (s *AuthService) GetAllUsers() []dto.UserListItem {
 		log.Println("Error querying users:", err)
 		return []dto.UserListItem{}
 	}
-	defer rows.Close() //nolint:errcheck
+	defer closeWithLog(rows, "closing users rows")
 
 	var users []models.User
 	for rows.Next() {
@@ -207,6 +207,13 @@ func (s *AuthService) GetUserByID(id int) (dto.UserOutput, error) {
 	}
 
 	return mapper.ToUserOutput(user), nil
+}
+
+// closeWithLog logs an error if closing the resource fails.
+func closeWithLog(closer interface{ Close() error }, context string) {
+	if err := closer.Close(); err != nil {
+		log.Printf("Error %s: %v", context, err)
+	}
 }
 
 // HasUsers checks if any users exist in the database.

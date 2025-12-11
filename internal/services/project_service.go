@@ -26,7 +26,7 @@ func (s *ProjectService) List(userID int) []dto.ProjectOutput {
 		log.Println("Error querying projects:", err)
 		return []dto.ProjectOutput{}
 	}
-	defer rows.Close()
+	defer closeWithLog(rows, "closing project list rows")
 
 	var projects []models.Project
 	for rows.Next() {
@@ -54,7 +54,7 @@ func (s *ProjectService) ListByClient(userID int, clientID int) []dto.ProjectOut
 		log.Println("Error querying projects by client:", err)
 		return []dto.ProjectOutput{}
 	}
-	defer rows.Close()
+	defer closeWithLog(rows, "closing project by client rows")
 
 	var projects []models.Project
 	for rows.Next() {
@@ -102,7 +102,7 @@ func (s *ProjectService) Create(userID int, input dto.CreateProjectInput) dto.Pr
 		log.Println("Error preparing project insert:", err)
 		return dto.ProjectOutput{}
 	}
-	defer stmt.Close()
+	defer closeWithLog(stmt, "closing project insert statement")
 
 	res, err := stmt.Exec(userID, entity.ClientID, entity.Name, entity.Description, entity.HourlyRate, entity.Currency, entity.Status, entity.Deadline, tagsStr)
 	if err != nil {
@@ -124,7 +124,7 @@ func (s *ProjectService) Update(userID int, input dto.UpdateProjectInput) dto.Pr
 		log.Println("Error preparing project update:", err)
 		return dto.ProjectOutput{}
 	}
-	defer stmt.Close()
+	defer closeWithLog(stmt, "closing project update statement")
 
 	_, err = stmt.Exec(input.ClientID, input.Name, input.Description, input.HourlyRate, input.Currency, input.Status, input.Deadline, tagsStr, input.ID, userID)
 	if err != nil {

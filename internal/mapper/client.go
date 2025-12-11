@@ -1,3 +1,4 @@
+// Package mapper converts between models and DTOs.
 package mapper
 
 import (

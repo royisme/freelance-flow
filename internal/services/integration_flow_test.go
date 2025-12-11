@@ -23,7 +23,11 @@ func TestMultiUserFlow_Integration(t *testing.T) {
 	// 1. Setup in-memory DB
 	db, err := sql.Open("sqlite3", ":memory:")
 	assert.NoError(t, err)
-	defer db.Close()
+	defer func() {
+		if cerr := db.Close(); cerr != nil {
+			t.Errorf("failed to close db: %v", cerr)
+		}
+	}()
 
 	// Create tables with full schema
 	queries := []string{
@@ -196,7 +200,11 @@ func TestAuth_LoginFlow_Integration(t *testing.T) {
 	// Setup DB
 	db, err := sql.Open("sqlite3", ":memory:")
 	assert.NoError(t, err)
-	defer db.Close()
+	defer func() {
+		if cerr := db.Close(); cerr != nil {
+			t.Errorf("failed to close db: %v", cerr)
+		}
+	}()
 
 	// Create users table
 	_, err = db.Exec(`

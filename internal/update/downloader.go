@@ -8,6 +8,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"path/filepath"
 )
 
 // Downloader handles file downloads with progress tracking.
@@ -46,7 +47,8 @@ func (d *Downloader) Download(ctx context.Context, url string, destPath string, 
 
 	// G304: Potential file inclusion via variable checked elsewhere or accepted risk for internal app
 	// G306: Expect WriteFile permissions to be 0600 or less
-	out, err := os.OpenFile(destPath, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0600)
+	cleanDestPath := filepath.Clean(destPath)
+	out, err := os.OpenFile(cleanDestPath, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0600)
 	if err != nil {
 		_ = resp.Body.Close() //nolint:errcheck
 		return fmt.Errorf("failed to create file: %w", err)
@@ -78,7 +80,7 @@ func (d *Downloader) Download(ctx context.Context, url string, destPath string, 
 
 // VerifyHash checks if the file at path matches the expected SHA256 hash.
 func (d *Downloader) VerifyHash(path string, expectedHash string) error {
-	f, err := os.Open(path)
+	f, err := os.Open(filepath.Clean(path))
 	if err != nil {
 		return fmt.Errorf("failed to open file for verification: %w", err)
 	}

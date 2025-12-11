@@ -1,3 +1,4 @@
+// Package main contains the Wails application entry and helper methods.
 package main
 
 import (

@@ -1,3 +1,4 @@
+// Package dto defines data transfer objects shared between layers.
 package dto
 
 // CreateClientInput represents the input for creating a new client.

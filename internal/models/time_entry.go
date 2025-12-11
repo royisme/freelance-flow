@@ -1,5 +1,7 @@
+// Package models defines database-backed domain models.
 package models
 
+// TimeEntry records tracked work for a project.
 type TimeEntry struct {
 	ID              int    `json:"id"`
 	ProjectID       int    `json:"projectId"`

@@ -27,7 +27,7 @@ func (s *InvoiceService) List(userID int) []dto.InvoiceOutput {
 		log.Println("Error querying invoices:", err)
 		return []dto.InvoiceOutput{}
 	}
-	defer rows.Close() //nolint:errcheck
+	defer closeWithLog(rows, "closing invoice rows")
 
 	var invoices []models.Invoice
 	for rows.Next() {
@@ -82,7 +82,7 @@ func (s *InvoiceService) Create(userID int, input dto.CreateInvoiceInput) dto.In
 		log.Println("Error preparing invoice insert:", err)
 		return dto.InvoiceOutput{}
 	}
-	defer stmt.Close()
+	defer closeWithLog(stmt, "closing invoice insert statement")
 
 	res, err := stmt.Exec(userID, entity.ClientID, entity.Number, entity.IssueDate, entity.DueDate, entity.Subtotal, entity.TaxRate, entity.TaxAmount, entity.Total, entity.Status, itemsJSON)
 	if err != nil {
@@ -107,7 +107,7 @@ func (s *InvoiceService) Update(userID int, input dto.UpdateInvoiceInput) dto.In
 		log.Println("Error preparing invoice update:", err)
 		return dto.InvoiceOutput{}
 	}
-	defer stmt.Close()
+	defer closeWithLog(stmt, "closing invoice update statement")
 
 	_, err = stmt.Exec(input.ClientID, input.Number, input.IssueDate, input.DueDate, input.Subtotal, input.TaxRate, input.TaxAmount, input.Total, input.Status, itemsJSON, input.ID, userID)
 	if err != nil {
@@ -128,11 +128,13 @@ func (s *InvoiceService) Delete(userID int, id int) {
 }
 
 // GeneratePDF is a placeholder for PDF generation.
-func (s *InvoiceService) GeneratePDF(userID int, id int) string {
+func (s *InvoiceService) GeneratePDF(_ int, _ int) string {
+	// TODO: implement real PDF generation using user and invoice context.
 	return "mock-pdf-base64-from-backend"
 }
 
 // SendEmail is a placeholder for email sending.
-func (s *InvoiceService) SendEmail(userID int, id int) bool {
+func (s *InvoiceService) SendEmail(_ int, _ int) bool {
+	// TODO: implement real email sending using user and invoice context.
 	return true
 }

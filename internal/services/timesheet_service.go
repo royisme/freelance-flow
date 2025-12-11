@@ -32,7 +32,7 @@ func (s *TimesheetService) List(userID int, projectID int) []dto.TimeEntryOutput
 		log.Println("Error querying time entries:", err)
 		return []dto.TimeEntryOutput{}
 	}
-	defer rows.Close()
+	defer closeWithLog(rows, "closing time entry rows")
 
 	var entries []models.TimeEntry
 	for rows.Next() {
@@ -67,7 +67,7 @@ func (s *TimesheetService) Create(userID int, input dto.CreateTimeEntryInput) dt
 		log.Println("Error preparing time entry insert:", err)
 		return dto.TimeEntryOutput{}
 	}
-	defer stmt.Close()
+	defer closeWithLog(stmt, "closing time entry insert statement")
 
 	res, err := stmt.Exec(userID, entity.ProjectID, entity.Date, entity.StartTime, entity.EndTime, entity.DurationSeconds, entity.Description, entity.Billable, entity.Invoiced)
 	if err != nil {
@@ -87,7 +87,7 @@ func (s *TimesheetService) Update(userID int, input dto.UpdateTimeEntryInput) dt
 		log.Println("Error preparing time entry update:", err)
 		return dto.TimeEntryOutput{}
 	}
-	defer stmt.Close()
+	defer closeWithLog(stmt, "closing time entry update statement")
 
 	_, err = stmt.Exec(input.ProjectID, input.Date, input.StartTime, input.EndTime, input.DurationSeconds, input.Description, input.Billable, input.Invoiced, input.ID, userID)
 	if err != nil {

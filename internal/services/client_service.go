@@ -25,7 +25,7 @@ func (s *ClientService) List(userID int) []dto.ClientOutput {
 		log.Println("Error querying clients:", err)
 		return []dto.ClientOutput{}
 	}
-	defer rows.Close() //nolint:errcheck
+	defer closeWithLog(rows, "closing client rows")
 
 	var clients []models.Client
 	for rows.Next() {
@@ -60,7 +60,7 @@ func (s *ClientService) Create(userID int, input dto.CreateClientInput) dto.Clie
 		log.Println("Error preparing insert:", err)
 		return dto.ClientOutput{}
 	}
-	defer stmt.Close()
+	defer closeWithLog(stmt, "closing client insert statement")
 
 	res, err := stmt.Exec(userID, entity.Name, entity.Email, entity.Website, entity.Avatar, entity.ContactPerson, entity.Address, entity.Currency, entity.Status, entity.Notes)
 	if err != nil {
@@ -80,7 +80,7 @@ func (s *ClientService) Update(userID int, input dto.UpdateClientInput) dto.Clie
 		log.Println("Error preparing update:", err)
 		return dto.ClientOutput{}
 	}
-	defer stmt.Close()
+	defer closeWithLog(stmt, "closing client update statement")
 
 	_, err = stmt.Exec(input.Name, input.Email, input.Website, input.Avatar, input.ContactPerson, input.Address, input.Currency, input.Status, input.Notes, input.ID, userID)
 	if err != nil {

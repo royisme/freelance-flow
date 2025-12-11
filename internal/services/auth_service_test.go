@@ -93,7 +93,11 @@ func TestVerifyPassword_WrongPassword(t *testing.T) {
 
 func TestRegister_Success(t *testing.T) {
 	db := setupTestDB(t)
-	defer db.Close() //nolint:errcheck
+	defer func() {
+		if err := db.Close(); err != nil {
+			t.Errorf("failed to close db: %v", err)
+		}
+	}()
 
 	authService := NewAuthService(db)
 
@@ -129,7 +133,11 @@ func TestRegister_Success(t *testing.T) {
 
 func TestRegister_DuplicateUsername(t *testing.T) {
 	db := setupTestDB(t)
-	defer db.Close() //nolint:errcheck
+	defer func() {
+		if err := db.Close(); err != nil {
+			t.Errorf("failed to close db: %v", err)
+		}
+	}()
 
 	authService := NewAuthService(db)
 
@@ -153,7 +161,11 @@ func TestRegister_DuplicateUsername(t *testing.T) {
 
 func TestRegister_EmptyUsername(t *testing.T) {
 	db := setupTestDB(t)
-	defer db.Close() //nolint:errcheck
+	defer func() {
+		if err := db.Close(); err != nil {
+			t.Errorf("failed to close db: %v", err)
+		}
+	}()
 
 	authService := NewAuthService(db)
 
@@ -170,7 +182,11 @@ func TestRegister_EmptyUsername(t *testing.T) {
 
 func TestRegister_EmptyPassword(t *testing.T) {
 	db := setupTestDB(t)
-	defer db.Close() //nolint:errcheck
+	defer func() {
+		if err := db.Close(); err != nil {
+			t.Errorf("failed to close db: %v", err)
+		}
+	}()
 
 	authService := NewAuthService(db)
 
@@ -191,7 +207,11 @@ func TestRegister_EmptyPassword(t *testing.T) {
 
 func TestLogin_Success(t *testing.T) {
 	db := setupTestDB(t)
-	defer db.Close() //nolint:errcheck
+	defer func() {
+		if err := db.Close(); err != nil {
+			t.Errorf("failed to close db: %v", err)
+		}
+	}()
 
 	authService := NewAuthService(db)
 
@@ -230,7 +250,11 @@ func TestLogin_Success(t *testing.T) {
 
 func TestLogin_WrongPassword(t *testing.T) {
 	db := setupTestDB(t)
-	defer db.Close() //nolint:errcheck
+	defer func() {
+		if err := db.Close(); err != nil {
+			t.Errorf("failed to close db: %v", err)
+		}
+	}()
 
 	authService := NewAuthService(db)
 
@@ -259,7 +283,11 @@ func TestLogin_WrongPassword(t *testing.T) {
 
 func TestLogin_UserNotFound(t *testing.T) {
 	db := setupTestDB(t)
-	defer db.Close() //nolint:errcheck
+	defer func() {
+		if err := db.Close(); err != nil {
+			t.Errorf("failed to close db: %v", err)
+		}
+	}()
 
 	authService := NewAuthService(db)
 
@@ -281,7 +309,11 @@ func TestLogin_UserNotFound(t *testing.T) {
 
 func TestGetAllUsers_Empty(t *testing.T) {
 	db := setupTestDB(t)
-	defer db.Close() //nolint:errcheck
+	defer func() {
+		if err := db.Close(); err != nil {
+			t.Errorf("failed to close db: %v", err)
+		}
+	}()
 
 	authService := NewAuthService(db)
 
@@ -294,7 +326,11 @@ func TestGetAllUsers_Empty(t *testing.T) {
 
 func TestGetAllUsers_MultipleUsers(t *testing.T) {
 	db := setupTestDB(t)
-	defer db.Close() //nolint:errcheck
+	defer func() {
+		if err := db.Close(); err != nil {
+			t.Errorf("failed to close db: %v", err)
+		}
+	}()
 
 	authService := NewAuthService(db)
 
@@ -316,7 +352,11 @@ func TestGetAllUsers_MultipleUsers(t *testing.T) {
 
 func TestHasUsers_False(t *testing.T) {
 	db := setupTestDB(t)
-	defer db.Close() //nolint:errcheck
+	defer func() {
+		if err := db.Close(); err != nil {
+			t.Errorf("failed to close db: %v", err)
+		}
+	}()
 
 	authService := NewAuthService(db)
 
@@ -327,7 +367,11 @@ func TestHasUsers_False(t *testing.T) {
 
 func TestHasUsers_True(t *testing.T) {
 	db := setupTestDB(t)
-	defer db.Close() //nolint:errcheck
+	defer func() {
+		if err := db.Close(); err != nil {
+			t.Errorf("failed to close db: %v", err)
+		}
+	}()
 
 	authService := NewAuthService(db)
 
@@ -345,7 +389,11 @@ func TestHasUsers_True(t *testing.T) {
 
 func TestGetUserByID_Success(t *testing.T) {
 	db := setupTestDB(t)
-	defer db.Close() //nolint:errcheck
+	defer func() {
+		if err := db.Close(); err != nil {
+			t.Errorf("failed to close db: %v", err)
+		}
+	}()
 
 	authService := NewAuthService(db)
 
@@ -370,7 +418,11 @@ func TestGetUserByID_Success(t *testing.T) {
 
 func TestGetUserByID_NotFound(t *testing.T) {
 	db := setupTestDB(t)
-	defer db.Close() //nolint:errcheck
+	defer func() {
+		if err := db.Close(); err != nil {
+			t.Errorf("failed to close db: %v", err)
+		}
+	}()
 
 	authService := NewAuthService(db)
 

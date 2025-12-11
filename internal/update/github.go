@@ -1,3 +1,4 @@
+// Package update implements update fetching and download helpers.
 package update
 
 import (
@@ -16,23 +17,24 @@ type GithubRelease struct {
 	TagName     string        `json:"tag_name"`
 	PublishedAt time.Time     `json:"published_at"`
 	Body        string        `json:"body"`
-	HtmlUrl     string        `json:"html_url"`
+	HTMLURL     string        `json:"html_url"`
 	Assets      []GithubAsset `json:"assets"`
 }
 
+// GithubAsset represents a file attached to a GitHub release.
 type GithubAsset struct {
 	Name               string `json:"name"`
 	Size               int64  `json:"size"`
-	BrowserDownloadUrl string `json:"browser_download_url"`
+	BrowserDownloadURL string `json:"browser_download_url"`
 }
 
 // FetchLatestRelease fetches the latest release from GitHub.
 // It tries to find 'update.json' in the assets for rich metadata.
 // If update.json is not found, it falls back to basic info from the release itself.
-func FetchLatestRelease(owner, repo string) (*UpdateInfo, error) {
+func FetchLatestRelease(owner, repo string) (*Info, error) {
 	url := fmt.Sprintf("%s/repos/%s/%s/releases/latest", GitHubAPIBaseURL, owner, repo)
 
-	resp, err := http.Get(url)
+	resp, err := http.Get(url) //nolint:gosec // URL built from validated owner/repo inputs.
 	if err != nil {
 		return nil, fmt.Errorf("failed to fetch release: %w", err)
 	}
@@ -52,7 +54,7 @@ func FetchLatestRelease(owner, repo string) (*UpdateInfo, error) {
 	// 1. Try to find update.json in assets
 	for _, asset := range release.Assets {
 		if asset.Name == "update.json" {
-			return fetchUpdateJSON(asset.BrowserDownloadUrl)
+			return fetchUpdateJSON(asset.BrowserDownloadURL)
 		}
 	}
 
@@ -65,25 +67,25 @@ func FetchLatestRelease(owner, repo string) (*UpdateInfo, error) {
 	for _, asset := range release.Assets {
 		name := strings.ToLower(asset.Name)
 		if strings.Contains(name, "darwin") && strings.Contains(name, "amd64") {
-			platforms["darwin-amd64"] = Platform{URL: asset.BrowserDownloadUrl, Size: asset.Size}
+			platforms["darwin-amd64"] = Platform{URL: asset.BrowserDownloadURL, Size: asset.Size}
 		} else if strings.Contains(name, "darwin") && strings.Contains(name, "arm64") {
-			platforms["darwin-arm64"] = Platform{URL: asset.BrowserDownloadUrl, Size: asset.Size}
+			platforms["darwin-arm64"] = Platform{URL: asset.BrowserDownloadURL, Size: asset.Size}
 		} else if strings.Contains(name, "windows") && strings.Contains(name, "amd64") {
-			platforms["windows-amd64"] = Platform{URL: asset.BrowserDownloadUrl, Size: asset.Size}
+			platforms["windows-amd64"] = Platform{URL: asset.BrowserDownloadURL, Size: asset.Size}
 		}
 	}
 
-	return &UpdateInfo{
+	return &Info{
 		Version:         version,
 		ReleaseDate:     release.PublishedAt,
 		ReleaseNotes:    release.Body,
-		ReleaseNotesURL: release.HtmlUrl,
+		ReleaseNotesURL: release.HTMLURL,
 		Platforms:       platforms,
 	}, nil
 }
 
-func fetchUpdateJSON(url string) (*UpdateInfo, error) {
-	resp, err := http.Get(url)
+func fetchUpdateJSON(url string) (*Info, error) {
+	resp, err := http.Get(url) //nolint:gosec // URL supplied by GitHub release metadata.
 	if err != nil {
 		return nil, fmt.Errorf("failed to fetch update.json: %w", err)
 	}
@@ -95,7 +97,7 @@ func fetchUpdateJSON(url string) (*UpdateInfo, error) {
 		return nil, fmt.Errorf("update.json download failed status: %d", resp.StatusCode)
 	}
 
-	var info UpdateInfo
+	var info Info
 	if err := json.NewDecoder(resp.Body).Decode(&info); err != nil {
 		return nil, fmt.Errorf("failed to decode update.json: %w", err)
 	}

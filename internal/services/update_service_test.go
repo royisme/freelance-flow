@@ -18,7 +18,9 @@ func TestUpdateService_CheckForUpdate(t *testing.T) {
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path == "/repos/royzhu/freelance-flow/releases/latest" {
-			json.NewEncoder(w).Encode(mockRelease)
+			if err := json.NewEncoder(w).Encode(mockRelease); err != nil {
+				t.Fatalf("failed to encode mock release: %v", err)
+			}
 			return
 		}
 		w.WriteHeader(http.StatusNotFound)
@@ -39,7 +41,7 @@ func TestUpdateService_CheckForUpdate(t *testing.T) {
 	}
 
 	state := service.GetUpdateState()
-	if state.Status != update.UpdateStatusAvailable {
+	if state.Status != update.StatusAvailable {
 		t.Errorf("Expected status Available, got %s. Error: %s", state.Status, state.Error)
 	}
 	if state.LatestVersion != "1.0.1" {

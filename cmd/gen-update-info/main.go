@@ -1,3 +1,4 @@
+// Package main generates update.json metadata for releases.
 package main
 
 import (
@@ -79,7 +80,7 @@ func main() {
 		}
 	}
 
-	info := update.UpdateInfo{
+	info := update.Info{
 		Version:         cleanVersion,
 		ReleaseDate:     time.Now().UTC(),
 		ReleaseNotes:    releaseNotes,

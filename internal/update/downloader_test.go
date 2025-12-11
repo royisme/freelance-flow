@@ -14,9 +14,11 @@ import (
 
 func TestDownload(t *testing.T) {
 	content := "Hello, World! This is a test file for downloading."
-	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 		w.Header().Set("Content-Length", fmt.Sprintf("%d", len(content)))
-		_, _ = fmt.Fprint(w, content)
+		if _, err := fmt.Fprint(w, content); err != nil {
+			t.Fatalf("failed to write response: %v", err)
+		}
 	}))
 	defer server.Close()
 
@@ -30,6 +32,7 @@ func TestDownload(t *testing.T) {
 		if total != int64(len(content)) {
 			t.Errorf("Expected total %d, got %d", len(content), total)
 		}
+		_ = current // ensure parameters are exercised
 	}
 
 	err := d.Download(context.Background(), server.URL, destPath, onProgress)
@@ -41,7 +44,7 @@ func TestDownload(t *testing.T) {
 		t.Error("onProgress was not called")
 	}
 
-	downloadedInfo, err := os.ReadFile(destPath)
+	downloadedInfo, err := os.ReadFile(filepath.Clean(destPath))
 	if err != nil {
 		t.Fatalf("Failed to read downloaded file: %v", err)
 	}

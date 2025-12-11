@@ -15,31 +15,31 @@ func TestFetchLatestRelease(t *testing.T) {
 		TagName     string    `json:"tag_name"`
 		PublishedAt time.Time `json:"published_at"`
 		Body        string    `json:"body"`
-		HtmlUrl     string    `json:"html_url"`
+		HTMLURL     string    `json:"html_url"`
 		Assets      []struct {
 			Name               string `json:"name"`
 			Size               int64  `json:"size"`
-			BrowserDownloadUrl string `json:"browser_download_url"`
+			BrowserDownloadURL string `json:"browser_download_url"`
 		} `json:"assets"`
 	}{
 		TagName:     "v1.0.1",
 		PublishedAt: time.Now(),
 		Body:        "Release notes content",
-		HtmlUrl:     "https://github.com/owner/repo/releases/tag/v1.0.1",
+		HTMLURL:     "https://github.com/owner/repo/releases/tag/v1.0.1",
 		Assets: []struct {
 			Name               string `json:"name"`
 			Size               int64  `json:"size"`
-			BrowserDownloadUrl string `json:"browser_download_url"`
+			BrowserDownloadURL string `json:"browser_download_url"`
 		}{
 			{
 				Name:               "FreelanceFlow-1.0.1-darwin-amd64.dmg",
 				Size:               1024,
-				BrowserDownloadUrl: "https://download.url/dmg",
+				BrowserDownloadURL: "https://download.url/dmg",
 			},
 			{
 				Name:               "update.json",
 				Size:               512,
-				BrowserDownloadUrl: "https://download.url/update.json",
+				BrowserDownloadURL: "https://download.url/update.json",
 			},
 		},
 	}
@@ -47,20 +47,24 @@ func TestFetchLatestRelease(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path == "/repos/owner/repo/releases/latest" {
 			// Update the download URL to point to this server
-			mockResponse.Assets[1].BrowserDownloadUrl = fmt.Sprintf("http://%s/update.json", r.Host)
-			_ = json.NewEncoder(w).Encode(mockResponse)
+			mockResponse.Assets[1].BrowserDownloadURL = fmt.Sprintf("http://%s/update.json", r.Host)
+			if err := json.NewEncoder(w).Encode(mockResponse); err != nil {
+				t.Fatalf("failed to encode mock response: %v", err)
+			}
 			return
 		}
 		if r.URL.Path == "/update.json" {
 			// Serve the update.json content
-			info := UpdateInfo{
+			info := Info{
 				Version:      "1.0.1",
 				ReleaseNotes: "Release notes from update.json", // distinct content to verify source
 				Platforms: map[string]Platform{
 					"darwin-amd64": {URL: "https://dl/dmg", Size: 2048},
 				},
 			}
-			_ = json.NewEncoder(w).Encode(info)
+			if err := json.NewEncoder(w).Encode(info); err != nil {
+				t.Fatalf("failed to encode update info: %v", err)
+			}
 			return
 		}
 

@@ -100,7 +100,11 @@ func setupFullTestDB(t *testing.T) *sql.DB {
 
 func TestDataIsolation(t *testing.T) {
 	db := setupFullTestDB(t)
-	defer db.Close()
+	defer func() {
+		if err := db.Close(); err != nil {
+			t.Errorf("failed to close db: %v", err)
+		}
+	}()
 
 	authService := NewAuthService(db)
 	clientService := NewClientService(db)

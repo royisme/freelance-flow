@@ -1,5 +1,7 @@
+// Package models defines database-backed domain models.
 package models
 
+// Project represents a client engagement tracked for billing.
 type Project struct {
 	ID          int      `json:"id"`
 	ClientID    int      `json:"clientId"`

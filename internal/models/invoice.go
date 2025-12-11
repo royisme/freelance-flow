@@ -1,5 +1,7 @@
+// Package models defines database-backed domain models.
 package models
 
+// InvoiceItem describes a single line item within an invoice.
 type InvoiceItem struct {
 	ID          int     `json:"id"`
 	Description string  `json:"description"`
@@ -8,6 +10,7 @@ type InvoiceItem struct {
 	Amount      float64 `json:"amount"`
 }
 
+// Invoice captures billing information for a client.
 type Invoice struct {
 	ID        int           `json:"id"`
 	ClientID  int           `json:"clientId"`

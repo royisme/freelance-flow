@@ -1,7 +1,9 @@
+// Package models defines database-backed domain models.
 package models
 
 import "time"
 
+// User represents an application account owner.
 type User struct {
 	ID           int       `json:"id"`
 	UUID         string    `json:"uuid"` // For future cloud sync

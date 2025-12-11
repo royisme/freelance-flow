@@ -1,3 +1,4 @@
+// Package db initializes and migrates the application database.
 package db
 
 import (
@@ -6,9 +7,11 @@ import (
 	"os"
 	"path/filepath"
 
+	// sqlite driver used by the application.
 	_ "github.com/mattn/go-sqlite3"
 )
 
+// Init sets up the SQLite database, creating directories and running migrations.
 func Init() *sql.DB {
 	// Ensure data directory exists
 	homeDir, err := os.UserHomeDir()
@@ -17,7 +20,7 @@ func Init() *sql.DB {
 	}
 
 	appDataDir := filepath.Join(homeDir, ".freelance-flow")
-	if err := os.MkdirAll(appDataDir, 0750); err != nil {
+	if err := os.MkdirAll(appDataDir, 0700); err != nil {
 		log.Fatal("Failed to create app data directory:", err)
 	}
 
