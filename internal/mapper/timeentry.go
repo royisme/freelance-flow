@@ -10,6 +10,7 @@ func ToTimeEntryOutput(e models.TimeEntry) dto.TimeEntryOutput {
 	return dto.TimeEntryOutput{
 		ID:              e.ID,
 		ProjectID:       e.ProjectID,
+		InvoiceID:       e.InvoiceID,
 		Date:            e.Date,
 		StartTime:       e.StartTime,
 		EndTime:         e.EndTime,
@@ -36,6 +37,7 @@ func ToTimeEntryOutputList(entities []models.TimeEntry) []dto.TimeEntryOutput {
 func ToTimeEntryEntity(input dto.CreateTimeEntryInput) models.TimeEntry {
 	return models.TimeEntry{
 		ProjectID:       input.ProjectID,
+		InvoiceID:       input.InvoiceID,
 		Date:            input.Date,
 		StartTime:       input.StartTime,
 		EndTime:         input.EndTime,
@@ -49,6 +51,7 @@ func ToTimeEntryEntity(input dto.CreateTimeEntryInput) models.TimeEntry {
 // ApplyTimeEntryUpdate applies UpdateTimeEntryInput to an existing TimeEntry entity.
 func ApplyTimeEntryUpdate(e *models.TimeEntry, input dto.UpdateTimeEntryInput) {
 	e.ProjectID = input.ProjectID
+	e.InvoiceID = input.InvoiceID
 	e.Date = input.Date
 	e.StartTime = input.StartTime
 	e.EndTime = input.EndTime

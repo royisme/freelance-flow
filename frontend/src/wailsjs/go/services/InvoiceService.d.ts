@@ -6,12 +6,14 @@ export function Create(arg1:number,arg2:dto.CreateInvoiceInput):Promise<dto.Invo
 
 export function Delete(arg1:number,arg2:number):Promise<void>;
 
-export function GeneratePDF(arg1:number,arg2:number):Promise<string>;
+export function GeneratePDF(arg1:number,arg2:number,arg3:string):Promise<string>;
 
 export function Get(arg1:number,arg2:number):Promise<dto.InvoiceOutput>;
 
 export function List(arg1:number):Promise<Array<dto.InvoiceOutput>>;
 
 export function SendEmail(arg1:number,arg2:number):Promise<boolean>;
+
+export function SetTimeEntries(arg1:number,arg2:dto.SetInvoiceTimeEntriesInput):Promise<dto.InvoiceOutput>;
 
 export function Update(arg1:number,arg2:dto.UpdateInvoiceInput):Promise<dto.InvoiceOutput>;

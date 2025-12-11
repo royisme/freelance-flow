@@ -6,7 +6,7 @@ export function CancelDownload():Promise<void>;
 
 export function CheckForUpdate():Promise<void>;
 
-export function GetUpdateState():Promise<update.UpdateState>;
+export function GetUpdateState():Promise<update.State>;
 
 export function InstallUpdate():Promise<void>;
 

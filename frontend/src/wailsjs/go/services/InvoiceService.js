@@ -10,8 +10,8 @@ export function Delete(arg1, arg2) {
   return window['go']['services']['InvoiceService']['Delete'](arg1, arg2);
 }
 
-export function GeneratePDF(arg1, arg2) {
-  return window['go']['services']['InvoiceService']['GeneratePDF'](arg1, arg2);
+export function GeneratePDF(arg1, arg2, arg3) {
+  return window['go']['services']['InvoiceService']['GeneratePDF'](arg1, arg2, arg3);
 }
 
 export function Get(arg1, arg2) {
@@ -24,6 +24,10 @@ export function List(arg1) {
 
 export function SendEmail(arg1, arg2) {
   return window['go']['services']['InvoiceService']['SendEmail'](arg1, arg2);
+}
+
+export function SetTimeEntries(arg1, arg2) {
+  return window['go']['services']['InvoiceService']['SetTimeEntries'](arg1, arg2);
 }
 
 export function Update(arg1, arg2) {

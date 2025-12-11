@@ -60,3 +60,9 @@ type InvoiceOutput struct {
 	Status    string              `json:"status"`
 	Items     []InvoiceItemOutput `json:"items"`
 }
+
+// SetInvoiceTimeEntriesInput links time entries to an invoice.
+type SetInvoiceTimeEntriesInput struct {
+	InvoiceID    int   `json:"invoiceId"`
+	TimeEntryIDs []int `json:"timeEntryIds"`
+}

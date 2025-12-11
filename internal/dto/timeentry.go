@@ -3,6 +3,7 @@ package dto
 // CreateTimeEntryInput represents the input for creating a new time entry.
 type CreateTimeEntryInput struct {
 	ProjectID       int    `json:"projectId"`
+	InvoiceID       int    `json:"invoiceId"`
 	Date            string `json:"date"`
 	StartTime       string `json:"startTime"`
 	EndTime         string `json:"endTime"`
@@ -16,6 +17,7 @@ type CreateTimeEntryInput struct {
 type UpdateTimeEntryInput struct {
 	ID              int    `json:"id"`
 	ProjectID       int    `json:"projectId"`
+	InvoiceID       int    `json:"invoiceId"`
 	Date            string `json:"date"`
 	StartTime       string `json:"startTime"`
 	EndTime         string `json:"endTime"`
@@ -29,6 +31,7 @@ type UpdateTimeEntryInput struct {
 type TimeEntryOutput struct {
 	ID              int    `json:"id"`
 	ProjectID       int    `json:"projectId"`
+	InvoiceID       int    `json:"invoiceId"`
 	Date            string `json:"date"`
 	StartTime       string `json:"startTime"`
 	EndTime         string `json:"endTime"`

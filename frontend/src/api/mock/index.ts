@@ -356,10 +356,14 @@ export const mockInvoiceService: IInvoiceService = {
   async delete(id) {
     invoices = invoices.filter((i) => i.id !== id);
   },
-  async generatePdf() {
+  async generatePdf(_id?: number, _message?: string) {
     return "mock-pdf-base64";
   },
   async sendEmail() {
     return true;
+  },
+  async setTimeEntries(input: dto.SetInvoiceTimeEntriesInput) {
+    // Mock: no-op, return first invoice
+    return invoices.find((i) => i.id === input.invoiceId) ?? invoices[0]!;
   },
 };

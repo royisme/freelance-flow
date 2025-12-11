@@ -26,6 +26,8 @@ func main() {
 	timesheetService := services.NewTimesheetService(dbConn)
 	invoiceService := services.NewInvoiceService(dbConn)
 	updateService := services.NewUpdateService()
+	settingsService := services.NewSettingsService(dbConn)
+	invoiceEmailSettingsService := services.NewInvoiceEmailSettingsService(dbConn)
 
 	// Create application with options
 	err := wails.Run(&options.App{
@@ -45,6 +47,8 @@ func main() {
 			timesheetService,
 			invoiceService,
 			updateService,
+			settingsService,
+			invoiceEmailSettingsService,
 		},
 	})
 

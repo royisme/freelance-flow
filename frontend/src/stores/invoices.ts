@@ -1,7 +1,11 @@
 import { defineStore, storeToRefs } from "pinia";
 import { ref, computed } from "vue";
 import { api } from "@/api";
-import type { Invoice, CreateInvoiceInput, UpdateInvoiceInput } from "@/types";
+import type {
+  Invoice,
+  CreateInvoiceInput,
+  UpdateInvoiceInput,
+} from "@/types";
 import { useClientStore } from "./clients";
 
 // Enriched Invoice for View (adds Client Name directly)
@@ -84,6 +88,24 @@ export const useInvoiceStore = defineStore("invoices", () => {
     };
   });
 
+  async function setTimeEntries(invoiceId: number, timeEntryIds: number[]) {
+    loading.value = true;
+    try {
+      await api.invoices.setTimeEntries({ invoiceId, timeEntryIds });
+      await fetchInvoices();
+    } finally {
+      loading.value = false;
+    }
+  }
+
+  async function generatePdf(id: number, message?: string) {
+    return api.invoices.generatePdf(id, message);
+  }
+
+  async function sendEmail(id: number) {
+    return api.invoices.sendEmail(id);
+  }
+
   return {
     invoices,
     enrichedInvoices,
@@ -93,5 +115,8 @@ export const useInvoiceStore = defineStore("invoices", () => {
     createInvoice,
     updateInvoice,
     deleteInvoice,
+    setTimeEntries,
+    generatePdf,
+    sendEmail,
   };
 });

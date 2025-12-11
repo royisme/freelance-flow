@@ -43,6 +43,7 @@ const menuOptions = computed<MenuOption[]>(() => [
     { label: t('nav.timesheet'), key: 'timesheet', icon: renderIcon(ClockCircleOutlined) },
     { label: t('nav.invoices'), key: 'invoices', icon: renderIcon(FileTextOutlined) },
     { label: t('nav.reports'), key: 'reports', icon: renderIcon(BarChartOutlined) },
+    { label: t('nav.settings'), key: 'settings/invoice', icon: renderIcon(SettingOutlined) },
 ])
 
 const activeKey = ref<string>(route.path.substring(1) || 'dashboard')

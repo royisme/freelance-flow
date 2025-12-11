@@ -60,6 +60,7 @@ func setupFullTestDB(t *testing.T) *sql.DB {
 			id INTEGER PRIMARY KEY AUTOINCREMENT,
 			user_id INTEGER,
 			project_id INTEGER NOT NULL,
+			invoice_id INTEGER,
 			date TEXT,
 			start_time TEXT,
 			end_time TEXT,
@@ -68,7 +69,8 @@ func setupFullTestDB(t *testing.T) *sql.DB {
 			billable BOOLEAN DEFAULT 1,
 			invoiced BOOLEAN DEFAULT 0,
 			FOREIGN KEY(user_id) REFERENCES users(id),
-			FOREIGN KEY(project_id) REFERENCES projects(id)
+			FOREIGN KEY(project_id) REFERENCES projects(id),
+			FOREIGN KEY(invoice_id) REFERENCES invoices(id)
 		);`,
 		`CREATE TABLE invoices (
 			id INTEGER PRIMARY KEY AUTOINCREMENT,

@@ -2,7 +2,9 @@ package services
 
 import (
 	"database/sql"
+	"encoding/json"
 	"freelance-flow/internal/dto"
+	"freelance-flow/internal/models"
 	"testing"
 
 	_ "github.com/mattn/go-sqlite3"
@@ -74,6 +76,7 @@ func TestMultiUserFlow_Integration(t *testing.T) {
 			id INTEGER PRIMARY KEY AUTOINCREMENT,
 			user_id INTEGER,
 			project_id INTEGER NOT NULL,
+			invoice_id INTEGER,
 			date TEXT,
 			start_time TEXT,
 			end_time TEXT,
@@ -82,7 +85,8 @@ func TestMultiUserFlow_Integration(t *testing.T) {
 			billable BOOLEAN DEFAULT 1,
 			invoiced BOOLEAN DEFAULT 0,
 			FOREIGN KEY(user_id) REFERENCES users(id),
-			FOREIGN KEY(project_id) REFERENCES projects(id)
+			FOREIGN KEY(project_id) REFERENCES projects(id),
+			FOREIGN KEY(invoice_id) REFERENCES invoices(id)
 		);`,
 		`CREATE TABLE invoices (
 			id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -232,7 +236,11 @@ func TestAuth_LoginFlow_Integration(t *testing.T) {
 	}
 	user, err := authService.Register(regInput)
 	assert.NoError(t, err)
-	assert.Equal(t, `{"theme":"dark"}`, user.SettingsJSON)
+	var registeredSettings models.UserSettings
+	err = json.Unmarshal([]byte(user.SettingsJSON), &registeredSettings)
+	assert.NoError(t, err)
+	assert.Equal(t, "dark", registeredSettings.Theme)
+	assert.Equal(t, "USD", registeredSettings.Currency)
 
 	// 2. Login Success
 	loginInput := dto.LoginInput{

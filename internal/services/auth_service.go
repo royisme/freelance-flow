@@ -2,6 +2,7 @@ package services
 
 import (
 	"database/sql"
+	"encoding/json"
 	"errors"
 	"freelance-flow/internal/dto"
 	"freelance-flow/internal/mapper"
@@ -74,10 +75,15 @@ func (s *AuthService) Register(input dto.RegisterInput) (dto.UserOutput, error) 
 	userUUID := uuid.New().String()
 
 	// Default settings if empty
-	settingsJSON := input.SettingsJSON
-	if settingsJSON == "" {
-		settingsJSON = "{}"
+	settings := defaultUserSettings()
+	if input.SettingsJSON != "" {
+		if err := json.Unmarshal([]byte(input.SettingsJSON), &settings); err != nil {
+			log.Println("Error parsing settingsJson, using defaults:", err)
+		}
 	}
+	settings = normalizeUserSettings(settings)
+	settingsBytes, _ := json.Marshal(settings)
+	settingsJSON := string(settingsBytes)
 
 	// Insert user
 	stmt, err := s.db.Prepare(`

@@ -7,3 +7,5 @@ export * from "./project.types";
 export * from "./timesheet.types";
 export * from "./invoice.types";
 export * from "./common.types";
+export * from "./settings.types";
+export * from "./email.types";

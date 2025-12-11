@@ -20,7 +20,7 @@ func NewTimesheetService(db *sql.DB) *TimesheetService {
 
 // List returns all time entries for a specific user, optionally filtered by project ID.
 func (s *TimesheetService) List(userID int, projectID int) []dto.TimeEntryOutput {
-	query := "SELECT id, project_id, date, start_time, end_time, duration_seconds, description, billable, invoiced FROM time_entries WHERE user_id = ?"
+	query := "SELECT id, project_id, invoice_id, date, start_time, end_time, duration_seconds, description, billable, invoiced FROM time_entries WHERE user_id = ?"
 	args := []interface{}{userID}
 	if projectID > 0 {
 		query += " AND project_id = ?"
@@ -37,7 +37,7 @@ func (s *TimesheetService) List(userID int, projectID int) []dto.TimeEntryOutput
 	var entries []models.TimeEntry
 	for rows.Next() {
 		var t models.TimeEntry
-		err := rows.Scan(&t.ID, &t.ProjectID, &t.Date, &t.StartTime, &t.EndTime, &t.DurationSeconds, &t.Description, &t.Billable, &t.Invoiced)
+		err := rows.Scan(&t.ID, &t.ProjectID, &t.InvoiceID, &t.Date, &t.StartTime, &t.EndTime, &t.DurationSeconds, &t.Description, &t.Billable, &t.Invoiced)
 		if err != nil {
 			log.Println("Error scanning time entry:", err)
 			continue
@@ -49,9 +49,9 @@ func (s *TimesheetService) List(userID int, projectID int) []dto.TimeEntryOutput
 
 // Get returns a single time entry by ID for a specific user.
 func (s *TimesheetService) Get(userID int, id int) (dto.TimeEntryOutput, error) {
-	row := s.db.QueryRow("SELECT id, project_id, date, start_time, end_time, duration_seconds, description, billable, invoiced FROM time_entries WHERE id = ? AND user_id = ?", id, userID)
+	row := s.db.QueryRow("SELECT id, project_id, invoice_id, date, start_time, end_time, duration_seconds, description, billable, invoiced FROM time_entries WHERE id = ? AND user_id = ?", id, userID)
 	var t models.TimeEntry
-	err := row.Scan(&t.ID, &t.ProjectID, &t.Date, &t.StartTime, &t.EndTime, &t.DurationSeconds, &t.Description, &t.Billable, &t.Invoiced)
+	err := row.Scan(&t.ID, &t.ProjectID, &t.InvoiceID, &t.Date, &t.StartTime, &t.EndTime, &t.DurationSeconds, &t.Description, &t.Billable, &t.Invoiced)
 	if err != nil {
 		return dto.TimeEntryOutput{}, err
 	}
@@ -62,14 +62,14 @@ func (s *TimesheetService) Get(userID int, id int) (dto.TimeEntryOutput, error) 
 func (s *TimesheetService) Create(userID int, input dto.CreateTimeEntryInput) dto.TimeEntryOutput {
 	entity := mapper.ToTimeEntryEntity(input)
 
-	stmt, err := s.db.Prepare("INSERT INTO time_entries(user_id, project_id, date, start_time, end_time, duration_seconds, description, billable, invoiced) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)")
+	stmt, err := s.db.Prepare("INSERT INTO time_entries(user_id, project_id, invoice_id, date, start_time, end_time, duration_seconds, description, billable, invoiced) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")
 	if err != nil {
 		log.Println("Error preparing time entry insert:", err)
 		return dto.TimeEntryOutput{}
 	}
 	defer closeWithLog(stmt, "closing time entry insert statement")
 
-	res, err := stmt.Exec(userID, entity.ProjectID, entity.Date, entity.StartTime, entity.EndTime, entity.DurationSeconds, entity.Description, entity.Billable, entity.Invoiced)
+	res, err := stmt.Exec(userID, entity.ProjectID, entity.InvoiceID, entity.Date, entity.StartTime, entity.EndTime, entity.DurationSeconds, entity.Description, entity.Billable, entity.Invoiced)
 	if err != nil {
 		log.Println("Error inserting time entry:", err)
 		return dto.TimeEntryOutput{}
@@ -82,14 +82,14 @@ func (s *TimesheetService) Create(userID int, input dto.CreateTimeEntryInput) dt
 
 // Update modifies an existing time entry for a specific user and returns the updated entry as DTO.
 func (s *TimesheetService) Update(userID int, input dto.UpdateTimeEntryInput) dto.TimeEntryOutput {
-	stmt, err := s.db.Prepare("UPDATE time_entries SET project_id=?, date=?, start_time=?, end_time=?, duration_seconds=?, description=?, billable=?, invoiced=? WHERE id=? AND user_id=?")
+	stmt, err := s.db.Prepare("UPDATE time_entries SET project_id=?, invoice_id=?, date=?, start_time=?, end_time=?, duration_seconds=?, description=?, billable=?, invoiced=? WHERE id=? AND user_id=?")
 	if err != nil {
 		log.Println("Error preparing time entry update:", err)
 		return dto.TimeEntryOutput{}
 	}
 	defer closeWithLog(stmt, "closing time entry update statement")
 
-	_, err = stmt.Exec(input.ProjectID, input.Date, input.StartTime, input.EndTime, input.DurationSeconds, input.Description, input.Billable, input.Invoiced, input.ID, userID)
+	_, err = stmt.Exec(input.ProjectID, input.InvoiceID, input.Date, input.StartTime, input.EndTime, input.DurationSeconds, input.Description, input.Billable, input.Invoiced, input.ID, userID)
 	if err != nil {
 		log.Println("Error updating time entry:", err)
 		return dto.TimeEntryOutput{}

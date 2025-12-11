@@ -152,6 +152,7 @@ export namespace dto {
 	}
 	export class CreateTimeEntryInput {
 	    projectId: number;
+	    invoiceId: number;
 	    date: string;
 	    startTime: string;
 	    endTime: string;
@@ -167,6 +168,7 @@ export namespace dto {
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.projectId = source["projectId"];
+	        this.invoiceId = source["invoiceId"];
 	        this.date = source["date"];
 	        this.startTime = source["startTime"];
 	        this.endTime = source["endTime"];
@@ -174,6 +176,40 @@ export namespace dto {
 	        this.description = source["description"];
 	        this.billable = source["billable"];
 	        this.invoiced = source["invoiced"];
+	    }
+	}
+	export class InvoiceEmailSettings {
+	    provider: string;
+	    from: string;
+	    replyTo: string;
+	    subjectTemplate: string;
+	    bodyTemplate: string;
+	    signature: string;
+	    resendApiKey: string;
+	    smtpHost: string;
+	    smtpPort: number;
+	    smtpUsername: string;
+	    smtpPassword: string;
+	    smtpUseTls: boolean;
+	
+	    static createFrom(source: any = {}) {
+	        return new InvoiceEmailSettings(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.provider = source["provider"];
+	        this.from = source["from"];
+	        this.replyTo = source["replyTo"];
+	        this.subjectTemplate = source["subjectTemplate"];
+	        this.bodyTemplate = source["bodyTemplate"];
+	        this.signature = source["signature"];
+	        this.resendApiKey = source["resendApiKey"];
+	        this.smtpHost = source["smtpHost"];
+	        this.smtpPort = source["smtpPort"];
+	        this.smtpUsername = source["smtpUsername"];
+	        this.smtpPassword = source["smtpPassword"];
+	        this.smtpUseTls = source["smtpUseTls"];
 	    }
 	}
 	
@@ -309,9 +345,24 @@ export namespace dto {
 	        this.settingsJson = source["settingsJson"];
 	    }
 	}
+	export class SetInvoiceTimeEntriesInput {
+	    invoiceId: number;
+	    timeEntryIds: number[];
+	
+	    static createFrom(source: any = {}) {
+	        return new SetInvoiceTimeEntriesInput(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.invoiceId = source["invoiceId"];
+	        this.timeEntryIds = source["timeEntryIds"];
+	    }
+	}
 	export class TimeEntryOutput {
 	    id: number;
 	    projectId: number;
+	    invoiceId: number;
 	    date: string;
 	    startTime: string;
 	    endTime: string;
@@ -328,6 +379,7 @@ export namespace dto {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.id = source["id"];
 	        this.projectId = source["projectId"];
+	        this.invoiceId = source["invoiceId"];
 	        this.date = source["date"];
 	        this.startTime = source["startTime"];
 	        this.endTime = source["endTime"];
@@ -448,6 +500,7 @@ export namespace dto {
 	export class UpdateTimeEntryInput {
 	    id: number;
 	    projectId: number;
+	    invoiceId: number;
 	    date: string;
 	    startTime: string;
 	    endTime: string;
@@ -464,6 +517,7 @@ export namespace dto {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.id = source["id"];
 	        this.projectId = source["projectId"];
+	        this.invoiceId = source["invoiceId"];
 	        this.date = source["date"];
 	        this.startTime = source["startTime"];
 	        this.endTime = source["endTime"];
@@ -515,6 +569,44 @@ export namespace dto {
 	        this.settingsJson = source["settingsJson"];
 	    }
 	}
+	export class UserSettings {
+	    currency: string;
+	    defaultTaxRate: number;
+	    language: string;
+	    theme: string;
+	    dateFormat: string;
+	    timezone: string;
+	    senderName: string;
+	    senderCompany: string;
+	    senderAddress: string;
+	    senderPhone: string;
+	    senderEmail: string;
+	    senderPostalCode: string;
+	    invoiceTerms: string;
+	    defaultMessageTemplate: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new UserSettings(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.currency = source["currency"];
+	        this.defaultTaxRate = source["defaultTaxRate"];
+	        this.language = source["language"];
+	        this.theme = source["theme"];
+	        this.dateFormat = source["dateFormat"];
+	        this.timezone = source["timezone"];
+	        this.senderName = source["senderName"];
+	        this.senderCompany = source["senderCompany"];
+	        this.senderAddress = source["senderAddress"];
+	        this.senderPhone = source["senderPhone"];
+	        this.senderEmail = source["senderEmail"];
+	        this.senderPostalCode = source["senderPostalCode"];
+	        this.invoiceTerms = source["invoiceTerms"];
+	        this.defaultMessageTemplate = source["defaultMessageTemplate"];
+	    }
+	}
 
 }
 
@@ -536,17 +628,18 @@ export namespace update {
 	        this.size = source["size"];
 	    }
 	}
-	export class UpdateInfo {
+	export class Info {
 	    version: string;
 	    // Go type: time
 	    releaseDate: any;
 	    releaseNotes: string;
 	    releaseNotesUrl?: string;
 	    mandatory: boolean;
+	    minimumOsVersion?: Record<string, string>;
 	    platforms: Record<string, Platform>;
 	
 	    static createFrom(source: any = {}) {
-	        return new UpdateInfo(source);
+	        return new Info(source);
 	    }
 	
 	    constructor(source: any = {}) {
@@ -556,6 +649,7 @@ export namespace update {
 	        this.releaseNotes = source["releaseNotes"];
 	        this.releaseNotesUrl = source["releaseNotesUrl"];
 	        this.mandatory = source["mandatory"];
+	        this.minimumOsVersion = source["minimumOsVersion"];
 	        this.platforms = this.convertValues(source["platforms"], Platform, true);
 	    }
 	
@@ -577,16 +671,17 @@ export namespace update {
 		    return a;
 		}
 	}
-	export class UpdateState {
+	
+	export class State {
 	    status: string;
 	    currentVersion: string;
 	    latestVersion?: string;
-	    updateInfo?: UpdateInfo;
+	    updateInfo?: Info;
 	    downloadProgress?: number;
 	    error?: string;
 	
 	    static createFrom(source: any = {}) {
-	        return new UpdateState(source);
+	        return new State(source);
 	    }
 	
 	    constructor(source: any = {}) {
@@ -594,7 +689,7 @@ export namespace update {
 	        this.status = source["status"];
 	        this.currentVersion = source["currentVersion"];
 	        this.latestVersion = source["latestVersion"];
-	        this.updateInfo = this.convertValues(source["updateInfo"], UpdateInfo);
+	        this.updateInfo = this.convertValues(source["updateInfo"], Info);
 	        this.downloadProgress = source["downloadProgress"];
 	        this.error = source["error"];
 	    }
