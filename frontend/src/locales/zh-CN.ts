@@ -17,6 +17,8 @@ export default {
     status: "状态",
     actions: "操作",
     configure: "配置",
+    next: "下一步",
+    prev: "上一步",
   },
 
   // 启动画面
@@ -64,6 +66,11 @@ export default {
     currency: "默认货币",
     province: "省份/地区（用于税率）",
     timezone: "时区",
+    // 分步表单
+    stepProfile: "资料",
+    stepSecurity: "安全",
+    stepPreferences: "偏好",
+    setPassword: "设置密码",
   },
 
   // 导航

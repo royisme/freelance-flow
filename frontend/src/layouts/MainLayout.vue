@@ -216,14 +216,14 @@ function handleMenuUpdate(key: string) {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0 24px;
+    padding: 0 var(--space-6);
     z-index: 10;
 }
 
 /* Brand Logo Area */
 .brand-logo {
-    font-family: 'Varela Round', sans-serif;
-    font-size: 1.5rem;
+    font-family: var(--font-display);
+    font-size: var(--text-2xl);
     font-weight: 800;
     color: var(--n-primary-color);
     letter-spacing: -0.02em;
@@ -231,7 +231,7 @@ function handleMenuUpdate(key: string) {
 
 /* Content Styles */
 .app-content {
-    padding: 24px;
+    padding: var(--space-6);
     height: 100%;
     overflow: auto;
 }
@@ -239,13 +239,13 @@ function handleMenuUpdate(key: string) {
 /* Footer Styles */
 .app-footer {
     height: 32px;
-    padding: 0 24px;
+    padding: 0 var(--space-6);
     display: flex;
     align-items: center;
     background-color: var(--n-color-modal);
     color: var(--n-text-color-3);
-    font-size: 0.85rem;
-    font-family: 'Inter', sans-serif;
+    font-size: var(--text-sm);
+    font-family: var(--font-sans);
     border-top: 1px solid var(--n-border-color);
 }
 
@@ -258,7 +258,7 @@ function handleMenuUpdate(key: string) {
 .status-bar {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: var(--space-3);
 }
 
 .divider {
@@ -275,11 +275,11 @@ strong {
 .user-menu-trigger {
     display: flex;
     align-items: center;
-    gap: 8px;
-    padding: 4px 12px 4px 4px;
-    border-radius: 20px;
+    gap: var(--space-2);
+    padding: var(--space-1) var(--space-3) var(--space-1) var(--space-1);
+    border-radius: var(--radius-full);
     cursor: pointer;
-    transition: background-color 0.2s;
+    transition: background-color var(--transition-normal);
 }
 
 .user-menu-trigger:hover {
@@ -287,7 +287,7 @@ strong {
 }
 
 .username {
-    font-size: 0.9rem;
+    font-size: var(--text-sm);
     font-weight: 500;
 }
 </style>

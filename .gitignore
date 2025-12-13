@@ -9,6 +9,8 @@ UserAgents.md
 .copal
 .gemini
 .copilot
+.agent
+.shared
 .cursorignore
 # Go
 /bin/

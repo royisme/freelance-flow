@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { RouterView } from 'vue-router'
-import { NLayout, NButton, NDropdown, NIcon, NSpace, NTooltip } from 'naive-ui'
+import { NButton, NDropdown, NIcon, NSpace, NTooltip } from 'naive-ui'
 import { GlobalOutlined, BulbOutlined, BulbFilled } from '@vicons/antd'
 import { useAppStore } from '@/stores/app'
 import { useI18n } from 'vue-i18n'
@@ -20,9 +20,9 @@ function handleLocaleSelect(key: 'zh-CN' | 'en-US') {
 </script>
 
 <template>
-    <div class="auth-layout">
-        <!-- Top Bar for controls -->
-        <div class="auth-header">
+    <div class="auth-layout auth-gradient-bg">
+        <!-- Transparent Header on gradient -->
+        <header class="auth-header">
             <div class="brand">FreelanceFlow</div>
             <n-space>
                 <n-dropdown :options="localeOptions" @select="handleLocaleSelect">
@@ -46,7 +46,7 @@ function handleLocaleSelect(key: 'zh-CN' | 'en-US') {
                     {{ appStore.theme === 'dark' ? t('theme.switchToLight') : t('theme.switchToDark') }}
                 </n-tooltip>
             </n-space>
-        </div>
+        </header>
 
         <!-- Main Content -->
         <div class="auth-content">
@@ -57,26 +57,25 @@ function handleLocaleSelect(key: 'zh-CN' | 'en-US') {
 
 <style scoped>
 .auth-layout {
-    height: 100%;
-    width: 100%;
+    min-height: 100vh;
+    width: 100vw;
     display: flex;
     flex-direction: column;
-    background-color: var(--n-color);
-    transition: background-color 0.3s;
 }
 
 .auth-header {
-    padding: 16px 32px;
+    padding: var(--space-4) var(--space-8);
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
 
 .brand {
-    font-family: 'Varela Round', sans-serif;
-    font-size: 1.2rem;
+    font-family: var(--font-display);
+    font-size: var(--text-xl);
     font-weight: 800;
-    color: var(--n-primary-color);
+    color: white;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
 .auth-content {
@@ -85,7 +84,16 @@ function handleLocaleSelect(key: 'zh-CN' | 'en-US') {
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: clamp(12px, 2.5vh, 20px);
-    overflow: auto;
+    padding: var(--space-4);
+    overflow: hidden;
+}
+
+/* Override button colors for visibility on gradient */
+.auth-header :deep(.n-button) {
+    color: white;
+}
+
+.auth-header :deep(.n-button:hover) {
+    background-color: rgba(255, 255, 255, 0.15);
 }
 </style>

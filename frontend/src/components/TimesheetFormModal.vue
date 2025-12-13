@@ -32,11 +32,14 @@ const formValue = ref<Omit<TimeEntry, 'id'>>({
   invoiced: false
 })
 
-const rules: FormRules = {
-  projectId: [{ required: true, type: 'number', message: t('timesheet.quickEntry.selectProject'), trigger: ['blur', 'change'] }],
-  date: [{ required: true, message: t('form.validation.select', { field: t('timesheet.form.date') }), trigger: ['blur', 'change'] }],
-  durationSeconds: [{ required: true, type: 'number', message: t('timesheet.quickEntry.invalidDuration'), trigger: ['blur', 'change'] }],
-  description: [{ required: true, message: t('timesheet.quickEntry.enterDescription'), trigger: ['blur', 'input'] }]
+import { timeEntrySchema } from '@/schemas/timesheet'
+import { useZodRule } from '@/utils/validation'
+
+const rules = {
+  projectId: useZodRule(timeEntrySchema.shape.projectId),
+  date: useZodRule(timeEntrySchema.shape.date),
+  durationSeconds: useZodRule(timeEntrySchema.shape.durationSeconds),
+  description: useZodRule(timeEntrySchema.shape.description)
 }
 
 // Convert seconds to hours for input

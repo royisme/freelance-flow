@@ -17,6 +17,8 @@ export default {
     status: "Status",
     actions: "Actions",
     configure: "Configure",
+    next: "Next",
+    prev: "Previous",
   },
 
   // Splash Screen
@@ -64,6 +66,11 @@ export default {
     currency: "Currency",
     province: "Province/Region (for tax)",
     timezone: "Timezone",
+    // Step form
+    stepProfile: "Profile",
+    stepSecurity: "Security",
+    stepPreferences: "Preferences",
+    setPassword: "Set Password",
   },
 
   // Navigation

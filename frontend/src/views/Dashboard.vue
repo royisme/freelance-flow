@@ -21,7 +21,9 @@ onMounted(() => {
           <n-statistic label="本周工时">
             <template #prefix>
               <div class="icon-box orange">
-                <n-icon><ClockCircleOutlined /></n-icon>
+                <n-icon>
+                  <ClockCircleOutlined />
+                </n-icon>
               </div>
             </template>
             <template #default>
@@ -31,13 +33,15 @@ onMounted(() => {
           </n-statistic>
         </n-card>
       </n-grid-item>
-      
+
       <n-grid-item>
         <n-card :bordered="true" class="metric-card">
           <n-statistic label="本月预计收入">
             <template #prefix>
               <div class="icon-box green">
-                <n-icon><DollarOutlined /></n-icon>
+                <n-icon>
+                  <DollarOutlined />
+                </n-icon>
               </div>
             </template>
             <template #default>
@@ -52,7 +56,9 @@ onMounted(() => {
           <n-statistic label="待收金额">
             <template #prefix>
               <div class="icon-box rose">
-                <n-icon><RiseOutlined /></n-icon>
+                <n-icon>
+                  <RiseOutlined />
+                </n-icon>
               </div>
             </template>
             <template #default>
@@ -69,14 +75,16 @@ onMounted(() => {
         <h2 class="section-title">最近活动</h2>
         <n-tag :bordered="false" type="default" size="small" class="clickable-tag">View All</n-tag>
       </div>
-      
+
       <n-card :bordered="true" class="activity-card-container" content-style="padding: 0;">
         <n-list hoverable clickable>
           <n-list-item v-for="activity in store.recentActivities" :key="activity.id">
             <div class="activity-item">
               <div class="activity-left">
                 <div class="activity-icon-bg">
-                  <n-icon size="18" color="#EA580C"><ClockCircleOutlined /></n-icon>
+                  <n-icon size="18" color="#EA580C">
+                    <ClockCircleOutlined />
+                  </n-icon>
                 </div>
                 <div class="activity-content">
                   <div class="activity-title">{{ activity.project }}</div>
@@ -88,7 +96,7 @@ onMounted(() => {
               </div>
             </div>
           </n-list-item>
-          
+
           <div v-if="store.recentActivities.length === 0" class="empty-state">
             暂无活动记录
           </div>
@@ -101,64 +109,55 @@ onMounted(() => {
 <style scoped>
 /* Metric Cards */
 .metric-card {
-  transition: all 0.2s ease;
+  transition: all var(--transition-normal);
 }
+
 .metric-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  border-color: #EA580C; /* Highlight border on hover */
+  box-shadow: var(--shadow-md);
+  border-color: var(--color-warm-orange);
 }
 
 /* Metric Typography */
 .metric-value {
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-sans);
   font-weight: 700;
   color: var(--n-text-color);
   letter-spacing: -0.03em;
 }
+
 .metric-unit {
-  font-size: 1rem;
+  font-size: var(--text-base);
   font-weight: 500;
   color: var(--n-text-color-3);
-  margin-left: 4px;
+  margin-left: var(--space-1);
 }
-
-/* Icons */
-.icon-box {
-  width: 48px;
-  height: 48px;
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-right: 12px;
-  font-size: 24px;
-}
-.icon-box.orange { background-color: #FFF7ED; color: #EA580C; }
-.icon-box.green { background-color: #ECFDF5; color: #059669; }
-.icon-box.rose { background-color: #FFF1F2; color: #E11D48; }
 
 /* Activity Section */
 .section-container {
-  margin-top: 40px;
+  margin-top: var(--space-10);
 }
+
 .section-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 16px;
+  margin-bottom: var(--space-4);
 }
+
 .section-title {
-  font-size: 1.25rem;
+  font-size: var(--text-xl);
   font-weight: 700;
   color: var(--n-text-color-2);
   margin: 0;
 }
+
 .clickable-tag {
   cursor: pointer;
   background-color: var(--n-close-color-hover);
   color: var(--n-text-color-3);
 }
+
 .clickable-tag:hover {
   background-color: var(--n-close-color-pressed);
   color: var(--n-text-color-2);
@@ -169,46 +168,50 @@ onMounted(() => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 16px 24px;
+  padding: var(--space-4) var(--space-6);
 }
+
 .activity-left {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: var(--space-4);
 }
+
 .activity-icon-bg {
   width: 40px;
   height: 40px;
-  border-radius: 50%;
-  background-color: #FFF7ED; /* Orange-50 */
+  border-radius: var(--radius-full);
+  background-color: var(--color-warning-bg);
   display: flex;
   align-items: center;
   justify-content: center;
 }
+
 .activity-title {
   font-weight: 600;
   color: var(--n-text-color);
-  font-size: 1rem;
+  font-size: var(--text-base);
 }
+
 .activity-desc {
   color: var(--n-text-color-3);
-  font-size: 0.875rem;
+  font-size: var(--text-sm);
   margin-top: 2px;
 }
+
 .hours-badge {
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-sans);
   font-weight: 600;
-  font-size: 0.9rem;
+  font-size: var(--text-sm);
   color: var(--n-text-color-2);
-  background-color: var(--n-action-color); 
-  padding: 6px 12px;
-  border-radius: 20px;
+  background-color: var(--n-action-color);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-full);
 }
 
 .empty-state {
   text-align: center;
-  padding: 40px;
+  padding: var(--space-10);
   color: var(--n-text-color-3);
 }
 </style>
-

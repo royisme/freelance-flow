@@ -1,15 +1,109 @@
-/* Global Styles */
+/* ============================================
+   FREELANCEFLOW DESIGN SYSTEM
+   Based on splash_bg.jpg warm tones + Glassmorphism
+   ============================================ */
+
+/* ---------- Google Fonts ---------- */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700&family=Varela+Round&display=swap');
+
 :root {
-  font-family: "Inter", sans-serif;
+  /* ---------- Typography ---------- */
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-heading: 'Poppins', var(--font-sans);
+  --font-display: 'Varela Round', var(--font-heading);
+  
   line-height: 1.5;
   font-weight: 400;
-
-  color-scheme: light;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
+  /* ---------- Warm Brand Colors (from splash_bg.jpg) ---------- */
+  --color-warm-orange: #FB923C;
+  --color-warm-amber: #F59E0B;
+  --color-warm-rose: #FB7185;
+  --color-warm-pink: #F472B6;
+  --color-warm-purple: #818CF8;
+  --color-deep-purple: #7C3AED;
+  --color-sky-blue: #38BDF8;
+  
+  /* ---------- Semantic Colors (Light Mode) ---------- */
+  --bg-base: #F8FAFC;
+  --bg-elevated: #FFFFFF;
+  --bg-card: rgba(255, 255, 255, 0.85);
+  --bg-card-solid: #FFFFFF;
+  --text-primary: #1E293B;
+  --text-secondary: #475569;
+  --text-muted: #64748B;
+  --text-on-gradient: #FFFFFF;
+  --border-default: #E2E8F0;
+  --border-light: rgba(255, 255, 255, 0.2);
+  
+  /* ---------- Status Colors ---------- */
+  --color-success: #10B981;
+  --color-success-bg: #ECFDF5;
+  --color-warning: #F59E0B;
+  --color-warning-bg: #FFF7ED;
+  --color-error: #EF4444;
+  --color-error-bg: #FEF2F2;
+  --color-info: #3B82F6;
+  --color-info-bg: #EFF6FF;
+
+  /* ---------- Spacing Scale ---------- */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+
+  /* ---------- Border Radius ---------- */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --radius-2xl: 24px;
+  --radius-full: 9999px;
+
+  /* ---------- Shadows ---------- */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  --shadow-xl: 0 20px 40px rgba(0, 0, 0, 0.15);
+  --shadow-glass: 0 8px 32px rgba(0, 0, 0, 0.1);
+
+  /* ---------- Gradients ---------- */
+  --gradient-warm: linear-gradient(135deg, #FB923C 0%, #F472B6 50%, #818CF8 100%);
+  --gradient-warm-subtle: linear-gradient(135deg, rgba(251, 146, 60, 0.8) 0%, rgba(244, 114, 182, 0.8) 50%, rgba(129, 140, 248, 0.8) 100%);
+  --gradient-glass-border: linear-gradient(135deg, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0.1) 100%);
+
+  /* ---------- Font Sizes ---------- */
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+  --text-3xl: 1.75rem;
+  --text-4xl: 2rem;
+  --text-5xl: 2.5rem;
+
+  /* ---------- Transitions ---------- */
+  --transition-fast: 150ms ease-out;
+  --transition-normal: 200ms ease-out;
+  --transition-slow: 300ms ease-out;
+  --transition-spring: 300ms cubic-bezier(0.16, 1, 0.3, 1);
+
+  color-scheme: light;
 }
+
+/* ============================================
+   GLOBAL RESETS
+   ============================================ */
 
 html,
 body,
@@ -20,12 +114,178 @@ body,
 body {
   margin: 0;
   display: flex;
-  /* background-color handled by NConfigProvider / Theme */
-  background-color: transparent; 
+  font-family: var(--font-sans);
+  background-color: transparent;
   color: var(--n-text-color);
-  overflow: hidden; /* Prevent window-level scrollbars */
+  overflow: hidden;
 }
 
 #app {
   width: 100%;
+}
+
+/* ============================================
+   GLASSMORPHISM UTILITIES
+   ============================================ */
+
+/* Warm gradient background for auth pages */
+/* Warm gradient background for auth pages - updated to match Splash screen */
+.auth-gradient-bg {
+  background-image: 
+    linear-gradient(135deg,
+      rgba(0, 0, 0, 0.6) 0%,
+      rgba(0, 0, 0, 0.3) 50%,
+      rgba(0, 0, 0, 0.6) 100%),
+    url('/splash_bg.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  background-color: var(--color-warm-orange); /* Fallback */
+}
+
+/* Glassmorphism card */
+.glass-card {
+  background: var(--bg-card);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-glass);
+}
+
+/* Frosted glass header */
+.glass-header {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--border-light);
+}
+
+/* Auth card - specific styling for login/register */
+.auth-card {
+  background: var(--bg-card);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-xl);
+  padding: var(--space-6);
+  max-width: 400px;
+  width: 100%;
+  box-shadow: var(--shadow-glass);
+  text-align: center;
+  position: relative;
+}
+
+.auth-card-lg {
+  max-width: 520px;
+  padding: var(--space-8);
+}
+
+/* ============================================
+   TYPOGRAPHY UTILITIES
+   ============================================ */
+
+.text-display {
+  font-family: var(--font-display);
+  font-weight: 700;
+}
+
+.text-heading {
+  font-family: var(--font-heading);
+  font-weight: 600;
+}
+
+.auth-title {
+  font-family: var(--font-heading);
+  font-size: var(--text-2xl);
+  font-weight: 700;
+  margin: 0 0 var(--space-1) 0;
+  color: var(--text-primary);
+}
+
+.auth-subtitle {
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+  margin: 0 0 var(--space-4) 0;
+}
+
+/* ============================================
+   ICON BOX UTILITIES
+   ============================================ */
+
+.icon-box {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: var(--space-3);
+  font-size: 24px;
+}
+
+.icon-box.orange {
+  background-color: var(--color-warning-bg);
+  color: var(--color-warm-orange);
+}
+
+.icon-box.green {
+  background-color: var(--color-success-bg);
+  color: var(--color-success);
+}
+
+.icon-box.rose {
+  background-color: var(--color-error-bg);
+  color: var(--color-warm-rose);
+}
+
+/* ============================================
+   SHARED ANIMATIONS
+   ============================================ */
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+@keyframes kenBurns {
+  0% { transform: scale(1); }
+  100% { transform: scale(1.1); }
+}
+
+/* Fade transition for Vue */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity var(--transition-slow);
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+/* ============================================
+   ACCESSIBILITY - Reduced Motion
+   ============================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

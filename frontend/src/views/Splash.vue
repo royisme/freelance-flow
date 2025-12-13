@@ -163,19 +163,9 @@ function handleStart() {
 
       <!-- Action Button / Auto-enter -->
       <div class="action-section">
-        <SplashProgress
-          v-if="showProgress"
-          :is-ready="isBackendReady"
-          :is-auto-redirecting="isAutoRedirecting"
-        />
-        <n-button
-          v-if="!showProgress && isBackendReady"
-          type="primary"
-          size="large"
-          round
-          class="start-button"
-          @click="handleStart"
-        >
+        <SplashProgress v-if="showProgress" :is-ready="isBackendReady" :is-auto-redirecting="isAutoRedirecting" />
+        <n-button v-if="!showProgress && isBackendReady" type="primary" size="large" round class="start-button"
+          @click="handleStart">
           <template #icon>
             <n-icon>
               <RocketOutlined />
@@ -226,26 +216,16 @@ function handleStart() {
   animation: kenBurns 20s ease-in-out infinite alternate;
 }
 
-@keyframes kenBurns {
-  0% {
-    transform: scale(1);
-  }
-
-  100% {
-    transform: scale(1.1);
-  }
-}
-
 .splash-overlay {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(135deg,
-      rgba(0, 0, 0, 0.6) 0%,
-      rgba(0, 0, 0, 0.3) 50%,
-      rgba(0, 0, 0, 0.6) 100%);
+  background: var(--gradient-overlay, linear-gradient(135deg,
+        rgba(0, 0, 0, 0.6) 0%,
+        rgba(0, 0, 0, 0.3) 50%,
+        rgba(0, 0, 0, 0.6) 100%));
 }
 
 .splash-content {
@@ -256,27 +236,27 @@ function handleStart() {
   align-items: center;
   justify-content: center;
   height: 100%;
-  padding: 40px;
+  padding: var(--space-10);
   text-align: center;
-  color: white;
+  color: var(--text-on-gradient);
 }
 
 .brand-section {
-  margin-bottom: 60px;
+  margin-bottom: var(--space-12);
 }
 
 .brand-title {
-  font-family: 'Varela Round', sans-serif;
-  font-size: 4rem;
+  font-family: var(--font-display);
+  font-size: var(--text-5xl);
   font-weight: 800;
   letter-spacing: -0.02em;
-  margin: 0 0 16px 0;
+  margin: 0 0 var(--space-4) 0;
   text-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
   animation: fadeInUp 1s ease-out;
 }
 
 .brand-tagline {
-  font-size: 1.25rem;
+  font-size: var(--text-xl);
   opacity: 0.9;
   margin: 0;
   min-height: 1.6em;
@@ -298,35 +278,23 @@ function handleStart() {
   opacity: 1;
 }
 
-@keyframes blink {
-
-  0%,
-  100% {
-    opacity: 1;
-  }
-
-  50% {
-    opacity: 0;
-  }
-}
-
 .action-section {
   min-height: 80px;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: var(--space-3);
   align-items: center;
   justify-content: center;
 }
 
 .start-button {
-  padding: 0 48px;
+  padding: 0 var(--space-12);
   height: 52px;
-  font-size: 1.1rem;
+  font-size: var(--text-lg);
   font-weight: 600;
   min-width: 200px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-  transition: all 0.3s ease;
+  box-shadow: var(--shadow-xl);
+  transition: all var(--transition-slow);
 }
 
 .start-button:hover:not(:disabled) {
@@ -341,23 +309,11 @@ function handleStart() {
 
 .splash-footer {
   position: absolute;
-  bottom: 24px;
+  bottom: var(--space-6);
   left: 0;
   right: 0;
   text-align: center;
-  font-size: 0.85rem;
+  font-size: var(--text-sm);
   opacity: 0.6;
-}
-
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
 }
 </style>

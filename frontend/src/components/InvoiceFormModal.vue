@@ -33,11 +33,15 @@ const formValue = ref<Omit<Invoice, 'id'>>({
   status: 'draft'
 })
 
-const rules: FormRules = {
-  clientId: [{ required: true, type: 'number', message: 'Please select a client', trigger: ['blur', 'change'] }],
-  number: [{ required: true, message: 'Please enter invoice number', trigger: ['blur', 'input'] }],
-  issueDate: [{ required: true, message: 'Please select issue date', trigger: ['blur', 'change'] }],
-  dueDate: [{ required: true, message: 'Please select due date', trigger: ['blur', 'change'] }]
+import { invoiceSchema } from '@/schemas/invoice'
+import { useZodRule } from '@/utils/validation'
+
+const rules = {
+  clientId: useZodRule(invoiceSchema.shape.clientId),
+  number: useZodRule(invoiceSchema.shape.number),
+  issueDate: useZodRule(invoiceSchema.shape.issueDate),
+  dueDate: useZodRule(invoiceSchema.shape.dueDate),
+  items: useZodRule(invoiceSchema.shape.items) // Validates the entire array
 }
 
 const statusOptions = [
@@ -131,15 +135,14 @@ function handleSubmit() {
 </script>
 
 <template>
-  <n-modal :show="show" @update:show="handleClose" preset="card" :style="{ width: '700px' }" :title="invoice ? 'Edit Invoice' : 'New Invoice'">
-    <n-form ref="formRef" :model="formValue" :rules="rules" label-placement="top" require-mark-placement="right-hanging">
+  <n-modal :show="show" @update:show="handleClose" preset="card" :style="{ width: '700px' }"
+    :title="invoice ? 'Edit Invoice' : 'New Invoice'">
+    <n-form ref="formRef" :model="formValue" :rules="rules" label-placement="top"
+      require-mark-placement="right-hanging">
       <n-space>
         <n-form-item label="Client" path="clientId" style="flex: 2;">
-          <n-select 
-            v-model:value="formValue.clientId" 
-            :options="clients.map(c => ({ label: c.name, value: c.id }))" 
-            placeholder="Select client"
-          />
+          <n-select v-model:value="formValue.clientId" :options="clients.map(c => ({ label: c.name, value: c.id }))"
+            placeholder="Select client" />
         </n-form-item>
 
         <n-form-item label="Invoice Number" path="number" style="flex: 1;">
@@ -149,11 +152,13 @@ function handleSubmit() {
 
       <n-space>
         <n-form-item label="Issue Date" path="issueDate" style="flex: 1;">
-          <n-date-picker v-model:formatted-value="formValue.issueDate" type="date" value-format="yyyy-MM-dd" style="width: 100%;" />
+          <n-date-picker v-model:formatted-value="formValue.issueDate" type="date" value-format="yyyy-MM-dd"
+            style="width: 100%;" />
         </n-form-item>
 
         <n-form-item label="Due Date" path="dueDate" style="flex: 1;">
-          <n-date-picker v-model:formatted-value="formValue.dueDate" type="date" value-format="yyyy-MM-dd" style="width: 100%;" />
+          <n-date-picker v-model:formatted-value="formValue.dueDate" type="date" value-format="yyyy-MM-dd"
+            style="width: 100%;" />
         </n-form-item>
 
         <n-form-item label="Status" path="status" style="flex: 1;">
@@ -161,16 +166,15 @@ function handleSubmit() {
         </n-form-item>
       </n-space>
 
-      <n-form-item label="Line Items">
-        <n-dynamic-input 
-          v-model:value="formValue.items" 
-          :on-create="createInvoiceItem"
-          #="{ value }"
-        >
+      <n-form-item label="Line Items" path="items">
+        <n-dynamic-input v-model:value="formValue.items" :on-create="createInvoiceItem" #="{ value }">
           <n-space>
-            <n-input v-model:value="value.description" placeholder="Description" style="width: 200px;" @update:value="handleItemChange(value)" />
-            <n-input-number v-model:value="value.quantity" :min="0" placeholder="Qty" style="width: 80px;" @update:value="handleItemChange(value)" />
-            <n-input-number v-model:value="value.unitPrice" :min="0" placeholder="Rate" style="width: 100px;" @update:value="handleItemChange(value)" />
+            <n-input v-model:value="value.description" placeholder="Description" style="width: 200px;"
+              @update:value="handleItemChange(value)" />
+            <n-input-number v-model:value="value.quantity" :min="0" placeholder="Qty" style="width: 80px;"
+              @update:value="handleItemChange(value)" />
+            <n-input-number v-model:value="value.unitPrice" :min="0" placeholder="Rate" style="width: 100px;"
+              @update:value="handleItemChange(value)" />
             <n-text strong>= ${{ value.amount.toFixed(2) }}</n-text>
           </n-space>
         </n-dynamic-input>
@@ -187,7 +191,8 @@ function handleSubmit() {
         </n-space>
         <n-space justify="space-between">
           <n-text strong style="font-size: 1.1em;">Total:</n-text>
-          <n-text strong style="font-size: 1.1em; color: var(--n-primary-color);">${{ calculatedTotal.toFixed(2) }}</n-text>
+          <n-text strong style="font-size: 1.1em; color: var(--n-primary-color);">${{ calculatedTotal.toFixed(2)
+          }}</n-text>
         </n-space>
       </n-space>
     </n-form>

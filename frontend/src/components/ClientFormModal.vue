@@ -33,17 +33,14 @@ const formValue = ref<Omit<Client, 'id'>>({
   notes: ''
 })
 
-const rules: FormRules = {
-  name: [
-    { required: true, message: t('form.validation.required', { field: t('form.client.name') }), trigger: ['blur', 'input'] }
-  ],
-  email: [
-    { required: true, message: t('form.validation.required', { field: t('form.client.email') }), trigger: ['blur', 'input'] },
-    { type: 'email', message: t('form.validation.email'), trigger: ['blur', 'input'] }
-  ],
-  currency: [
-    { required: true, message: t('form.validation.select', { field: t('form.client.currency') }), trigger: ['blur', 'change'] }
-  ]
+import { clientSchema } from '@/schemas/client'
+import { useZodRule } from '@/utils/validation'
+
+const rules = {
+  name: useZodRule(clientSchema.shape.name),
+  email: useZodRule(clientSchema.shape.email),
+  currency: useZodRule(clientSchema.shape.currency),
+  status: useZodRule(clientSchema.shape.status)
 }
 
 const currencyOptions = [

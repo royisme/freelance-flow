@@ -1,4 +1,5 @@
 import { createApp } from "vue";
+import { setupZodI18n } from "@/utils/validation";
 import { createPinia } from "pinia";
 import { createI18n } from "vue-i18n";
 import router from "./router";
@@ -29,5 +30,6 @@ const app = createApp(App);
 app.use(pinia);
 app.use(router);
 app.use(i18n);
+setupZodI18n(i18n);
 
 app.mount("#app");

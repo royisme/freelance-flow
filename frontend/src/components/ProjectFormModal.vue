@@ -33,11 +33,17 @@ const formValue = ref<Omit<Project, 'id'>>({
   tags: []
 })
 
-const rules: FormRules = {
-  name: [{ required: true, message: t('form.validation.required', { field: t('form.project.name') }), trigger: ['blur', 'input'] }],
-  clientId: [{ required: true, type: 'number', message: t('form.validation.select', { field: t('form.project.client') }), trigger: ['blur', 'change'] }],
-  hourlyRate: [{ required: true, type: 'number', message: t('form.validation.required', { field: t('form.project.hourlyRate') }), trigger: ['blur', 'change'] }],
-  currency: [{ required: true, message: t('form.validation.select', { field: t('form.project.currency') }), trigger: ['blur', 'change'] }]
+import { projectSchema } from '@/schemas/project'
+import { useZodRule } from '@/utils/validation'
+
+const rules = {
+  name: useZodRule(projectSchema.shape.name),
+  clientId: useZodRule(projectSchema.shape.clientId),
+  hourlyRate: useZodRule(projectSchema.shape.hourlyRate),
+  currency: useZodRule(projectSchema.shape.currency),
+  status: useZodRule(projectSchema.shape.status),
+  // Naive UI validator for tags (array) via Zod
+  tags: useZodRule(projectSchema.shape.tags)
 }
 
 const currencyOptions = [
