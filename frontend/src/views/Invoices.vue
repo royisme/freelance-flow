@@ -356,7 +356,7 @@ const columns: DataTableColumns<EnrichedInvoice> = [
                   <FileTextOutlined />
                 </n-icon>
               </div>
-              <n-statistic label="Total Invoices">
+              <n-statistic :label="t('invoices.stats.totalInvoices')">
                 <n-number-animation :from="0" :to="enrichedInvoices.length" />
               </n-statistic>
             </div>
@@ -367,7 +367,7 @@ const columns: DataTableColumns<EnrichedInvoice> = [
       <div class="content-wrapper">
         <!-- Search and Filter Bar -->
         <div class="toolbar">
-          <n-input v-model:value="searchQuery" placeholder="Search invoices..." class="search-input">
+          <n-input v-model:value="searchQuery" :placeholder="t('invoices.searchPlaceholder')" class="search-input">
             <template #prefix>
               <n-icon :component="SearchOutlined" />
             </template>
@@ -375,15 +375,15 @@ const columns: DataTableColumns<EnrichedInvoice> = [
           <div class="filters">
             <n-button quaternary size="small" :type="statusFilter === null ? 'primary' : 'default'"
               @click="statusFilter = null">
-              All
+              {{ t('invoices.filter.all') }}
             </n-button>
             <n-button quaternary size="small" :type="statusFilter === 'draft' ? 'primary' : 'default'"
               @click="statusFilter = 'draft'">
-              Draft
+              {{ t('invoices.filter.draft') }}
             </n-button>
             <n-button quaternary size="small" :type="statusFilter === 'sent' ? 'primary' : 'default'"
               @click="statusFilter = 'sent'">
-              Sent
+              {{ t('invoices.filter.sent') }}
             </n-button>
           </div>
         </div>
@@ -392,9 +392,9 @@ const columns: DataTableColumns<EnrichedInvoice> = [
           :row-class-name="() => 'invoice-row'" class="invoice-table">
           <template #empty>
             <div class="empty-state">
-              <n-empty description="No invoices found." size="large">
+              <n-empty :description="t('invoices.empty.description')" size="large">
                 <template #extra>
-                  <n-button dashed size="small" @click="handleNewInvoice">Create your first invoice</n-button>
+                  <n-button dashed size="small" @click="handleNewInvoice">{{ t('invoices.empty.action') }}</n-button>
                 </template>
               </n-empty>
             </div>
@@ -404,28 +404,30 @@ const columns: DataTableColumns<EnrichedInvoice> = [
     </div>
 
     <!-- Modals -->
-    <n-modal v-model:show="entrySelectorVisible" preset="card" title="Select Time Entries" style="width: 720px"
-      :segmented="true">
+    <n-modal v-model:show="entrySelectorVisible" preset="card" :title="t('invoices.selectEntries.title')"
+      style="width: 720px" :segmented="true">
       <n-data-table :loading="timesLoading" :columns="[
-        { title: 'Date', key: 'date' },
-        { title: 'Project', key: 'project', render: (row: EntryRow) => row.project?.name || '-' },
-        { title: 'Hours', key: 'hours', render: (row: EntryRow) => (row.durationSeconds / 3600).toFixed(2) },
-        { title: 'Linked', key: 'linked', render: (row: EntryRow) => (row.invoiceId ? '✔' : '') }
+        { title: t('invoices.selectEntries.columns.date'), key: 'date' },
+        { title: t('invoices.selectEntries.columns.project'), key: 'project', render: (row: EntryRow) => row.project?.name || '-' },
+        { title: t('invoices.selectEntries.columns.hours'), key: 'hours', render: (row: EntryRow) => (row.durationSeconds / 3600).toFixed(2) },
+        { title: t('invoices.selectEntries.columns.linked'), key: 'linked', render: (row: EntryRow) => (row.invoiceId ? '✔' : '') }
       ]" :data="enrichedEntries.filter((e) => !activeInvoiceId || e.invoiceId === activeInvoiceId || !e.invoiceId)"
         :row-key="(row: EntryRow) => row.id" checkable :checked-row-keys="entrySelection"
         @update:checked-row-keys="(keys) => entrySelection = keys as number[]" :max-height="400" />
       <template #footer>
         <n-space justify="end">
-          <n-button quaternary @click="entrySelectorVisible = false">Cancel</n-button>
-          <n-button type="primary" :loading="loading" @click="applyEntrySelection">Apply Selection</n-button>
+          <n-button quaternary @click="entrySelectorVisible = false">{{ t('invoices.selectEntries.cancel') }}</n-button>
+          <n-button type="primary" :loading="loading" @click="applyEntrySelection">{{ t('invoices.selectEntries.apply')
+            }}</n-button>
         </n-space>
       </template>
     </n-modal>
 
-    <n-modal v-model:show="messageModalVisible" preset="dialog" title="Prepare PDF" positive-text="Download PDF"
-      negative-text="Cancel" :loading="pdfLoading" @positive-click="confirmDownload">
+    <n-modal v-model:show="messageModalVisible" preset="dialog" :title="t('invoices.preparePdf.title')"
+      :positive-text="t('invoices.preparePdf.positive')" :negative-text="t('invoices.preparePdf.negative')"
+      :loading="pdfLoading" @positive-click="confirmDownload">
       <n-input v-model:value="messageDraft" type="textarea" :autosize="{ minRows: 4, maxRows: 8 }"
-        placeholder="Custom message to display on the invoice..." />
+        :placeholder="t('invoices.preparePdf.messagePlaceholder')" />
     </n-modal>
   </PageContainer>
 </template>
