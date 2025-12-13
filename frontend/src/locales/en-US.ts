@@ -96,7 +96,8 @@ export default {
   // Footer/Status Bar
   footer: {
     statusBar: "Status Bar:",
-    weeklyHours: "Weekly Hours:",
+    monthlyHours: "Monthly Hours:",
+    uninvoiced: "Uninvoiced:",
     pendingPayment: "Pending Payment:",
   },
 
@@ -256,8 +257,43 @@ export default {
     createSuccess: "Invoice created successfully",
     saveError: "Failed to save invoice",
     downloading: "Downloading {number}...",
+    entriesUpdated: "Entries updated successfully",
+    searchPlaceholder: "Search invoices...",
+    downloaded: "Downloaded",
+    downloadError: "Failed to download PDF",
+    sendSuccess: "Invoice sent successfully",
+    sendError: "Failed to send invoice",
     stats: {
       outstandingAmount: "Outstanding Amount",
+      totalInvoices: "Total Invoices",
+    },
+    filter: {
+      all: "All",
+      draft: "Draft",
+      sent: "Sent",
+      paid: "Paid",
+      overdue: "Overdue",
+    },
+    empty: {
+      description: "No invoices found.",
+      action: "Create your first invoice",
+    },
+    selectEntries: {
+      title: "Select Time Entries",
+      columns: {
+        date: "Date",
+        project: "Project",
+        hours: "Hours",
+        linked: "Linked",
+      },
+      cancel: "Cancel",
+      apply: "Apply Selection",
+    },
+    preparePdf: {
+      title: "Prepare PDF",
+      positive: "Download PDF",
+      negative: "Cancel",
+      messagePlaceholder: "Custom message to display on the invoice...",
     },
     columns: {
       invoiceNumber: "Invoice #",
@@ -268,9 +304,38 @@ export default {
       actions: "Actions",
     },
     status: {
+      draft: "Draft",
       paid: "Paid",
       sent: "Sent",
       overdue: "Overdue",
+    },
+    form: {
+      editTitle: "Edit Invoice",
+      newTitle: "New Invoice",
+      client: "Client",
+      selectClient: "Select client",
+      status: "Status",
+      invoiceNumber: "Invoice Number",
+      issueDate: "Issue Date",
+      dueDate: "Due Date",
+      items: {
+        title: "Line Items",
+        description: "Description",
+        descriptionPlaceholder: "Item description",
+        qty: "Qty",
+        rate: "Rate",
+        amount: "Amount",
+      },
+      subtotal: "Subtotal",
+      taxRate: "Tax Rate",
+      taxAmount: "Tax Amount",
+      total: "Total",
+      cancel: "Cancel",
+      update: "Update Invoice",
+      create: "Create Invoice",
+      validation: {
+        fixErrors: "Please fix form errors",
+      },
     },
   },
 

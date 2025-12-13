@@ -3,10 +3,11 @@ import {
     NLayout, NLayoutSider, NLayoutContent, NLayoutHeader, NLayoutFooter,
     NMenu, NIcon, NButton, NTooltip, NSpace, NDropdown, NAvatar
 } from 'naive-ui'
-import { ref, watch, h, computed, type Component } from 'vue'
+import { ref, watch, h, computed, onMounted, type Component } from 'vue'
 import { RouterView, useRouter, useRoute } from 'vue-router'
 import { useAppStore } from '@/stores/app'
 import { useAuthStore } from '@/stores/auth'
+import { useStatusBarStore } from '@/stores/statusBar'
 import { useI18n } from 'vue-i18n'
 import type { MenuOption, DropdownOption } from 'naive-ui'
 import {
@@ -33,6 +34,7 @@ const router = useRouter()
 const route = useRoute()
 const appStore = useAppStore()
 const authStore = useAuthStore()
+const statusBarStore = useStatusBarStore()
 const { t } = useI18n()
 
 // Menu options using i18n
@@ -150,6 +152,10 @@ watch(() => route.path, (newPath) => {
 function handleMenuUpdate(key: string) {
     router.push('/' + key)
 }
+
+onMounted(() => {
+    statusBarStore.refresh()
+})
 </script>
 
 <template>
@@ -219,9 +225,11 @@ function handleMenuUpdate(key: string) {
         <n-layout-footer bordered position="absolute" class="app-footer">
             <div class="status-bar">
                 <span class="status-item">{{ t('footer.statusBar') }}</span>
-                <span class="status-item">{{ t('footer.weeklyHours') }} <strong>32h</strong></span>
+                <span class="status-item">{{ t('footer.monthlyHours') }} <strong>{{ statusBarStore.monthHoursLabel }}</strong></span>
                 <span class="divider">|</span>
-                <span class="status-item">{{ t('footer.pendingPayment') }} <strong>$2,400</strong></span>
+                <span class="status-item">{{ t('footer.uninvoiced') }} <strong>{{ statusBarStore.uninvoicedTotalLabel }}</strong></span>
+                <span class="divider">|</span>
+                <span class="status-item">{{ t('footer.pendingPayment') }} <strong>{{ statusBarStore.unpaidTotalLabel }}</strong></span>
             </div>
         </n-layout-footer>
 

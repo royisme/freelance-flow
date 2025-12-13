@@ -34,6 +34,7 @@ func main() {
 	settingsService := services.NewSettingsService(dbConn)
 	invoiceEmailSettingsService := services.NewInvoiceEmailSettingsService(dbConn)
 	reportService := services.NewReportService(dbConn)
+	statusBarService := services.NewStatusBarService(dbConn)
 	servicesDuration := time.Since(servicesStart)
 
 	app.SetBootTimings(BootTimings{
@@ -66,6 +67,7 @@ func main() {
 			settingsService,
 			invoiceEmailSettingsService,
 			reportService,
+			statusBarService,
 		},
 	})
 

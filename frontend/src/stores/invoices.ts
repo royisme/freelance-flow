@@ -7,6 +7,7 @@ import type {
   UpdateInvoiceInput,
 } from "@/types";
 import { useClientStore } from "./clients";
+import { useStatusBarStore } from "./statusBar";
 
 // Enriched Invoice for View (adds Client Name directly)
 export type EnrichedInvoice = Invoice & {
@@ -19,6 +20,7 @@ export const useInvoiceStore = defineStore("invoices", () => {
   const loading = ref(false);
   const clientStore = useClientStore();
   const { clients } = storeToRefs(clientStore);
+  const statusBarStore = useStatusBarStore();
 
   async function fetchInvoices() {
     loading.value = true;
@@ -28,6 +30,7 @@ export const useInvoiceStore = defineStore("invoices", () => {
         await clientStore.fetchClients();
       }
       invoices.value = await api.invoices.list();
+      await statusBarStore.refresh();
     } catch (error) {
       console.error("Failed to fetch invoices", error);
     } finally {

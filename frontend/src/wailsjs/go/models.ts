@@ -452,6 +452,24 @@ export namespace dto {
 	        this.timeEntryIds = source["timeEntryIds"];
 	    }
 	}
+	export class StatusBarOutput {
+	    monthSeconds: number;
+	    uninvoicedTotal: number;
+	    unpaidTotal: number;
+	    currency: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new StatusBarOutput(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.monthSeconds = source["monthSeconds"];
+	        this.uninvoicedTotal = source["uninvoicedTotal"];
+	        this.unpaidTotal = source["unpaidTotal"];
+	        this.currency = source["currency"];
+	    }
+	}
 	export class TimeEntryOutput {
 	    id: number;
 	    projectId: number;

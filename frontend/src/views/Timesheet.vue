@@ -15,6 +15,7 @@ import { useProjectStore } from '@/stores/projects'
 import { storeToRefs } from 'pinia'
 import { useI18n } from 'vue-i18n'
 import type { TimeEntry } from '@/types'
+import { dateOnlySortKey, formatISODateOnlyForLocale } from '@/utils/date'
 import {
   ClockCircleOutlined,
   EditOutlined,
@@ -25,7 +26,7 @@ import {
 const message = useMessage()
 const timesheetStore = useTimesheetStore()
 const projectStore = useProjectStore()
-const { entries, loading } = storeToRefs(timesheetStore)
+const { entries, enrichedEntries, loading } = storeToRefs(timesheetStore)
 const { projects } = storeToRefs(projectStore)
 const { t, locale } = useI18n()
 
@@ -48,7 +49,7 @@ const columns = computed<DataTableColumns<TimeEntry & { project?: { name: string
     title: t('timesheet.columns.date'),
     key: 'date',
     width: 120,
-    sorter: (a, b) => getDateTimestamp(a.date) - getDateTimestamp(b.date),
+    sorter: (a, b) => dateOnlySortKey(a.date) - dateOnlySortKey(b.date),
     defaultSortOrder: 'descend',
     render(row) {
       return formatDate(row.date)
@@ -150,17 +151,7 @@ const columns = computed<DataTableColumns<TimeEntry & { project?: { name: string
 
 // Helpers
 function formatDate(dateStr: string): string {
-  const date = new Date(dateStr)
-  return new Intl.DateTimeFormat(locale.value === 'zh-CN' ? 'zh-CN' : 'en-US', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric'
-  }).format(date)
-}
-
-function getDateTimestamp(dateStr: string): number {
-  const ts = new Date(dateStr).getTime()
-  return Number.isFinite(ts) ? ts : 0
+  return formatISODateOnlyForLocale(dateStr, locale.value === 'zh-CN' ? 'zh-CN' : 'en-US')
 }
 
 function formatHours(seconds: number): string {
@@ -301,7 +292,7 @@ onMounted(() => {
       </div>
 
       <template v-else>
-        <n-data-table :columns="columns" :data="entries" :pagination="pagination" :row-key="(row: TimeEntry) => row.id"
+        <n-data-table :columns="columns" :data="enrichedEntries" :pagination="pagination" :row-key="(row: TimeEntry) => row.id"
           :checked-row-keys="checkedRowKeys" @update:checked-row-keys="handleCheckedRowKeysChange" size="small"
           class="entries-table" />
       </template>

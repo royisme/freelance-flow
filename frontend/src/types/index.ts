@@ -11,3 +11,4 @@ export * from "./settings.types";
 export * from "./email.types";
 export * from "./report.types";
 export * from "./finance.types";
+export * from "./status.types";

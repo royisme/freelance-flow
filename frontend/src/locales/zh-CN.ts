@@ -96,7 +96,8 @@ export default {
   // 底部状态栏
   footer: {
     statusBar: "状态栏：",
-    weeklyHours: "本周工时：",
+    monthlyHours: "本月工时：",
+    uninvoiced: "未开发票：",
     pendingPayment: "待收款：",
   },
 

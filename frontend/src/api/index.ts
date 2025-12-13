@@ -15,6 +15,7 @@ import * as WailsSettingsService from "@/wailsjs/go/services/SettingsService";
 import * as WailsInvoiceEmailSettingsService from "@/wailsjs/go/services/InvoiceEmailSettingsService";
 import { useAuthStore } from "@/stores/auth";
 import { dto } from "@/wailsjs/go/models";
+import { dateOnlySortKey } from "@/utils/date";
 import type { InvoiceEmailSettings } from "@/types";
 import type { ReportFilter, ReportOutput } from "@/types";
 import type {
@@ -22,6 +23,7 @@ import type {
   IProjectService,
   ITimeEntryService,
   IInvoiceService,
+  StatusBarOutput,
 } from "@/types";
 
 // Check if we're in Wails runtime (window.go exists)
@@ -122,6 +124,21 @@ const wailsInvoiceEmailSettingsService = {
   export: () => WailsInvoiceEmailSettingsService.ExportSettings(getUserId()),
 };
 
+const wailsStatusBarService = {
+  get: () => {
+    const wails = window as unknown as {
+      go: {
+        services: {
+          StatusBarService: {
+            Get: (userId: number) => Promise<StatusBarOutput>;
+          };
+        };
+      };
+    };
+    return wails.go.services.StatusBarService.Get(getUserId());
+  },
+};
+
 const mockEmailSettings: InvoiceEmailSettings = {
   provider: "mailto",
   subjectTemplate: "Invoice {{number}}",
@@ -139,6 +156,7 @@ export const api = isWailsRuntime
       settings: wailsSettingsService,
       reports: wailsReportService,
       invoiceEmailSettings: wailsInvoiceEmailSettingsService,
+      statusBar: wailsStatusBarService,
     }
   : {
       clients: mockClientService,
@@ -179,6 +197,61 @@ export const api = isWailsRuntime
         get: async () => mockEmailSettings,
         update: async (input: InvoiceEmailSettings) => input,
         export: async () => JSON.stringify(mockEmailSettings),
+      },
+      statusBar: {
+        get: async (): Promise<StatusBarOutput> => {
+          const [entries, invoices, projects, settings] = await Promise.all([
+            mockTimeEntryService.list(undefined),
+            mockInvoiceService.list(),
+            mockProjectService.list(),
+            // Use mock settings to provide currency.
+            // (Mock mode doesn't persist real settings.)
+            (async () => ({
+              currency: "USD",
+            }))(),
+          ]);
+
+          const now = new Date();
+          const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+          const nextMonthStart = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+          const monthStartKey =
+            monthStart.getFullYear() * 10000 +
+            (monthStart.getMonth() + 1) * 100 +
+            monthStart.getDate();
+          const nextMonthStartKey =
+            nextMonthStart.getFullYear() * 10000 +
+            (nextMonthStart.getMonth() + 1) * 100 +
+            nextMonthStart.getDate();
+
+          const monthSeconds = entries
+            .filter((e) => {
+              const key = dateOnlySortKey(e.date);
+              return key >= monthStartKey && key < nextMonthStartKey;
+            })
+            .reduce((acc, e) => acc + (e.durationSeconds ?? 0), 0);
+
+          const unpaidTotal = invoices
+            .filter((inv) => inv.status === "sent" || inv.status === "overdue")
+            .reduce((acc, inv) => acc + (inv.total ?? 0), 0);
+
+          const projectRateById = new Map<number, number>(
+            projects.map((p) => [p.id, p.hourlyRate ?? 0])
+          );
+          const uninvoicedTotal = entries
+            .filter((e) => e.billable !== false && e.invoiced !== true)
+            .reduce((acc, e) => {
+              const rate = projectRateById.get(e.projectId) ?? 0;
+              const hours = (e.durationSeconds ?? 0) / 3600;
+              return acc + hours * rate;
+            }, 0);
+
+          return {
+            monthSeconds,
+            uninvoicedTotal,
+            unpaidTotal,
+            currency: settings.currency,
+          };
+        },
       },
     };
 

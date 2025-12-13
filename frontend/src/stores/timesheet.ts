@@ -8,6 +8,7 @@ import type {
   Project,
 } from "@/types";
 import { useProjectStore } from "./projects";
+import { useStatusBarStore } from "./statusBar";
 
 // Grouped Data Interface for View
 export interface DailyTimeGroup {
@@ -21,6 +22,7 @@ export const useTimesheetStore = defineStore("timesheet", () => {
   const loading = ref(false);
   const projectStore = useProjectStore();
   const { projects } = storeToRefs(projectStore);
+  const statusBarStore = useStatusBarStore();
 
   // Actions
   async function fetchTimesheet(projectId?: number) {
@@ -31,6 +33,7 @@ export const useTimesheetStore = defineStore("timesheet", () => {
         await projectStore.fetchProjects();
       }
       entries.value = await api.timeEntries.list(projectId);
+      await statusBarStore.refresh();
     } catch (error) {
       console.error("Failed to fetch timesheet", error);
     } finally {
