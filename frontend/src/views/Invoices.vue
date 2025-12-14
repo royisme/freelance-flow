@@ -6,6 +6,7 @@ import {
   type DataTableColumns, NPopconfirm, useMessage
 } from 'naive-ui'
 import PageContainer from '@/components/PageContainer.vue'
+import PageHeader from '@/components/PageHeader.vue'
 import InvoiceFormModal from '@/components/InvoiceFormModal.vue'
 import { useInvoiceStore, type EnrichedInvoice } from '@/stores/invoices'
 import { useClientStore } from '@/stores/clients'
@@ -347,17 +348,19 @@ const columns: DataTableColumns<EnrichedInvoice> = [
 </script>
 
 <template>
-  <PageContainer :title="t('invoices.title')" :subtitle="t('invoices.subtitle')">
-    <template #extra>
-      <n-button type="primary" class="create-btn" @click="handleNewInvoice">
-        <template #icon>
-          <n-icon>
-            <PlusOutlined />
-          </n-icon>
-        </template>
-        {{ t('invoices.createInvoice') }}
-      </n-button>
-    </template>
+  <PageContainer>
+    <PageHeader :title="t('invoices.title')" :subtitle="t('invoices.subtitle')">
+      <template #extra>
+        <n-button type="primary" class="create-btn" @click="handleNewInvoice">
+          <template #icon>
+            <n-icon>
+              <PlusOutlined />
+            </n-icon>
+          </template>
+          {{ t('invoices.createInvoice') }}
+        </n-button>
+      </template>
+    </PageHeader>
 
     <InvoiceFormModal v-model:show="showModal" :invoice="editingInvoice" :clients="clients"
       @create="handleCreateInvoiceFromEntries" @update="handleUpdateInvoice" />

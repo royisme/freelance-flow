@@ -411,6 +411,20 @@ export default {
   dashboard: {
     title: "仪表盘",
     subtitle: "您的自由职业业务概览",
+    greeting: "早安,{name} 👋",
+    weekOverview: "这里是你本周的工作概览",
+    metrics: {
+      weeklyHours: "本周工时",
+      monthlyRevenue: "本月预计收入",
+      pendingAmount: "待收金额",
+      hoursUnit: "小时",
+    },
+    recentActivity: {
+      title: "最近活动",
+      viewAll: "查看全部",
+      empty: "暂无活动记录",
+      hoursLabel: "{hours}h",
+    },
   },
 
   // 报表

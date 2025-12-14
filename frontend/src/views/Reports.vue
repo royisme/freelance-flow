@@ -11,19 +11,17 @@ import {
   NSpace,
   NSpin,
   NStatistic,
-  NPageHeader,
   type DataTableColumns,
 } from "naive-ui";
 import PageContainer from "@/components/PageContainer.vue";
+import PageHeader from "@/components/PageHeader.vue";
 import { api } from "@/api";
 import type { Client, Project, ReportFilter, ReportOutput, ReportRow } from "@/types";
 import VChart from "vue-echarts";
 import type { EChartsOption } from "echarts";
 import { useI18n } from "vue-i18n";
-import { useRouter } from "vue-router";
 
 const { t } = useI18n();
-const router = useRouter();
 
 const loading = ref(false);
 const error = ref<string | null>(null);
@@ -86,9 +84,9 @@ onMounted(async () => {
 });
 
 const columns = computed<DataTableColumns<ReportRow>>(() => [
-  { title: t("reports.table.date"), key: "date", width: 90 },
-  { title: t("reports.table.client"), key: "clientName", width: 120 },
-  { title: t("reports.table.project"), key: "projectName", ellipsis: true },
+  { title: t("reports.table.date"), key: "date", width: 110 },
+  { title: t("reports.table.client"), key: "clientName", width: 100 },
+  { title: t("reports.table.project"), key: "projectName", ellipsis: { tooltip: true } },
   {
     title: t("reports.table.hours"),
     key: "hours",
@@ -147,28 +145,23 @@ const tablePagination = {
 </script>
 
 <template>
-  <PageContainer :title="t('reports.title')" :subtitle="t('reports.subtitle')">
-    <template #header>
-      <n-page-header :subtitle="t('reports.subtitle')" @back="router.back()">
-        <template #title>
-          {{ t('reports.title') }}
-        </template>
-        <template #extra>
-          <n-space size="large">
-            <n-statistic :label="t('reports.stats.totalHours')">
-              <template #default>
-                {{ report?.totalHours || 0 }}
-              </template>
-            </n-statistic>
-            <n-statistic :label="t('reports.stats.totalIncome')">
-              <template #default>
-                {{ report?.totalIncome || 0 }}
-              </template>
-            </n-statistic>
-          </n-space>
-        </template>
-      </n-page-header>
-    </template>
+  <PageContainer fill>
+    <PageHeader :title="t('reports.title')" :subtitle="t('reports.subtitle')">
+      <template #extra>
+        <n-space size="large">
+          <n-statistic :label="t('reports.stats.totalHours')">
+            <template #default>
+              {{ report?.totalHours || 0 }}
+            </template>
+          </n-statistic>
+          <n-statistic :label="t('reports.stats.totalIncome')">
+            <template #default>
+              {{ report?.totalIncome || 0 }}
+            </template>
+          </n-statistic>
+        </n-space>
+      </template>
+    </PageHeader>
 
     <div class="reports-root">
       <n-card class="filters-card" size="small" :content-style="{ padding: '8px 12px' }">
@@ -200,10 +193,13 @@ const tablePagination = {
 
             <n-empty v-if="report.rows.length === 0" :description="t('reports.empty')" size="small" />
 
-            <div v-else class="table-wrapper">
-              <n-data-table :columns="columns" :data="report.rows" :bordered="false" :pagination="tablePagination"
-                :loading="loading" size="small" />
-            </div>
+            <n-card v-else class="table-card" :bordered="true" size="small"
+              :content-style="{ padding: 0, height: '100%', display: 'flex', flexDirection: 'column' }">
+              <div class="table-scroll-container">
+                <n-data-table :columns="columns" :data="report.rows" :bordered="false" :loading="loading"
+                  size="small" />
+              </div>
+            </n-card>
           </div>
         </template>
       </div>
@@ -216,11 +212,13 @@ const tablePagination = {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  height: 100%;
+  flex: 1;
   min-height: 0;
 }
 
 .reports-body {
+  display: flex;
+  flex-direction: column;
   flex: 1;
   min-height: 0;
   position: relative;
@@ -245,9 +243,33 @@ const tablePagination = {
   height: clamp(180px, 32vh, 320px);
 }
 
-.table-wrapper {
+.table-card {
   flex: 1;
   min-height: 0;
+}
+
+.table-scroll-container {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+/* Custom scrollbar styling */
+.table-scroll-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.table-scroll-container::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.table-scroll-container::-webkit-scrollbar-thumb {
+  background: var(--n-scrollbar-color);
+  border-radius: 3px;
+}
+
+.table-scroll-container::-webkit-scrollbar-thumb:hover {
+  background: var(--n-scrollbar-color-hover);
 }
 
 .filter-date {

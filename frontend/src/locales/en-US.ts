@@ -413,6 +413,20 @@ export default {
   dashboard: {
     title: "Dashboard",
     subtitle: "Overview of your freelance business",
+    greeting: "Good morning, {name} 👋",
+    weekOverview: "Here's your overview for this week",
+    metrics: {
+      weeklyHours: "Weekly Hours",
+      monthlyRevenue: "Monthly Revenue",
+      pendingAmount: "Pending Amount",
+      hoursUnit: "hours",
+    },
+    recentActivity: {
+      title: "Recent Activity",
+      viewAll: "View All",
+      empty: "No recent activity",
+      hoursLabel: "{hours}h",
+    },
   },
 
   // Reports

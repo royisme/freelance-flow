@@ -5,6 +5,7 @@ import {
   type DataTableColumns, useMessage, useDialog
 } from 'naive-ui'
 import PageContainer from '@/components/PageContainer.vue'
+import PageHeader from '@/components/PageHeader.vue'
 import ClientFormModal from '@/components/ClientFormModal.vue'
 import { useClientStore } from '@/stores/clients'
 import { useProjectStore } from '@/stores/projects'
@@ -206,17 +207,19 @@ const columns: DataTableColumns<Client> = [
 </script>
 
 <template>
-  <PageContainer :title="t('clients.title')" :subtitle="t('clients.subtitle')">
-    <template #extra>
-      <n-button type="primary" @click="handleNewClient">
-        <template #icon>
-          <n-icon>
-            <PlusOutlined />
-          </n-icon>
-        </template>
-        {{ t('clients.addClient') }}
-      </n-button>
-    </template>
+  <PageContainer>
+    <PageHeader :title="t('clients.title')" :subtitle="t('clients.subtitle')">
+      <template #extra>
+        <n-button type="primary" @click="handleNewClient">
+          <template #icon>
+            <n-icon>
+              <PlusOutlined />
+            </n-icon>
+          </template>
+          {{ t('clients.addClient') }}
+        </n-button>
+      </template>
+    </PageHeader>
 
     <ClientFormModal v-model:show="showModal" :client="editingClient" @submit="handleSubmitClient" />
 

@@ -19,6 +19,13 @@ The goal is to make adding new functionality (e.g. **Tax Prep**) predictable and
 - Router wiring + module guard: `frontend/src/router/index.ts`
 - Module toggles UI: `frontend/src/views/settings/GeneralSettings.vue`
 
+## 1.1 Copal Memory Shortcut (Codex CLI)
+
+This decision is also stored in CoPal memory.
+
+- Memory: `copal memory show 24635ac8-3c31-4d11-8602-5bd78e92ebc8`
+- Codex prompt: `.codex/prompts/copal/memory-modules.md`
+
 ## 2. Data Model (Persistence)
 
 Module enable/disable state is stored in `users.settings_json` as part of `UserSettings`:
@@ -113,4 +120,3 @@ To participate in module gating, routes must set:
 - `meta.moduleID = "<module id>"`
 
 If you forget this, the route will not be blocked when disabled.
-

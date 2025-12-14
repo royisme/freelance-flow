@@ -5,6 +5,7 @@ import {
   useMessage, useDialog
 } from 'naive-ui'
 import PageContainer from '@/components/PageContainer.vue'
+import PageHeader from '@/components/PageHeader.vue'
 import ProjectFormModal from '@/components/ProjectFormModal.vue'
 import { useProjectStore } from '@/stores/projects'
 import { useClientStore } from '@/stores/clients'
@@ -170,17 +171,19 @@ const columns: DataTableColumns<Project> = [
 </script>
 
 <template>
-  <PageContainer :title="t('projects.title')" :subtitle="t('projects.subtitle')">
-    <template #extra>
-      <n-button type="primary" @click="handleNewProject">
-        <template #icon>
-          <n-icon>
-            <PlusOutlined />
-          </n-icon>
-        </template>
-        {{ t('projects.addProject') }}
-      </n-button>
-    </template>
+  <PageContainer>
+    <PageHeader :title="t('projects.title')" :subtitle="t('projects.subtitle')">
+      <template #extra>
+        <n-button type="primary" @click="handleNewProject">
+          <template #icon>
+            <n-icon>
+              <PlusOutlined />
+            </n-icon>
+          </template>
+          {{ t('projects.addProject') }}
+        </n-button>
+      </template>
+    </PageHeader>
 
     <ProjectFormModal v-model:show="showModal" :project="editingProject" :clients="clients"
       @submit="handleSubmitProject" />

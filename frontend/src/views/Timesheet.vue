@@ -7,6 +7,7 @@ import {
 } from 'naive-ui'
 import type { DataTableColumns } from 'naive-ui'
 import PageContainer from '@/components/PageContainer.vue'
+import PageHeader from '@/components/PageHeader.vue'
 
 import QuickTimeEntry from '@/components/QuickTimeEntry.vue'
 import TimesheetFormModal from '@/components/TimesheetFormModal.vue'
@@ -234,7 +235,8 @@ onMounted(() => {
 </script>
 
 <template>
-  <PageContainer :title="t('timesheet.title')" :subtitle="t('timesheet.subtitle')">
+  <PageContainer>
+    <PageHeader :title="t('timesheet.title')" :subtitle="t('timesheet.subtitle')" />
 
     <!-- Edit Modal -->
     <TimesheetFormModal v-model:show="showModal" :entry="editingEntry" :projects="projects"
