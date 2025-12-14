@@ -1,6 +1,9 @@
 /* ============================================
    FREELANCEFLOW DESIGN SYSTEM
-   Based on splash_bg.jpg warm tones + Glassmorphism
+   Semantic CSS Architecture (3 layers):
+   - Layer 1: Primitives (palette)
+   - Layer 2: Semantics (usage tokens)
+   - Layer 3: Accessors (utilities/components consume semantics)
    ============================================ */
 
 /* ---------- Google Fonts ---------- */
@@ -18,37 +21,6 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-
-  /* ---------- Warm Brand Colors (from splash_bg.jpg) ---------- */
-  --color-warm-orange: #FB923C;
-  --color-warm-amber: #F59E0B;
-  --color-warm-rose: #FB7185;
-  --color-warm-pink: #F472B6;
-  --color-warm-purple: #818CF8;
-  --color-deep-purple: #7C3AED;
-  --color-sky-blue: #38BDF8;
-  
-  /* ---------- Semantic Colors (Light Mode) ---------- */
-  --bg-base: #F8FAFC;
-  --bg-elevated: #FFFFFF;
-  --bg-card: rgba(255, 255, 255, 0.85);
-  --bg-card-solid: #FFFFFF;
-  --text-primary: #1E293B;
-  --text-secondary: #475569;
-  --text-muted: #64748B;
-  --text-on-gradient: #FFFFFF;
-  --border-default: #E2E8F0;
-  --border-light: rgba(255, 255, 255, 0.2);
-  
-  /* ---------- Status Colors ---------- */
-  --color-success: #10B981;
-  --color-success-bg: #ECFDF5;
-  --color-warning: #F59E0B;
-  --color-warning-bg: #FFF7ED;
-  --color-error: #EF4444;
-  --color-error-bg: #FEF2F2;
-  --color-info: #3B82F6;
-  --color-info-bg: #EFF6FF;
 
   /* ---------- Spacing Scale ---------- */
   --space-1: 4px;
@@ -76,11 +48,6 @@
   --shadow-xl: 0 20px 40px rgba(0, 0, 0, 0.15);
   --shadow-glass: 0 8px 32px rgba(0, 0, 0, 0.1);
 
-  /* ---------- Gradients ---------- */
-  --gradient-warm: linear-gradient(135deg, #FB923C 0%, #F472B6 50%, #818CF8 100%);
-  --gradient-warm-subtle: linear-gradient(135deg, rgba(251, 146, 60, 0.8) 0%, rgba(244, 114, 182, 0.8) 50%, rgba(129, 140, 248, 0.8) 100%);
-  --gradient-glass-border: linear-gradient(135deg, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0.1) 100%);
-
   /* ---------- Font Sizes ---------- */
   --text-xs: 0.75rem;
   --text-sm: 0.875rem;
@@ -98,7 +65,20 @@
   --transition-slow: 300ms ease-out;
   --transition-spring: 300ms cubic-bezier(0.16, 1, 0.3, 1);
 
+  /* ============================================
+     LAYER 3: ACCESSORS (Compatibility aliases)
+     Keep existing variable names stable while routing through semantics.
+     ============================================ */
+  --bg-base: var(--bg-app);
+  --bg-elevated: var(--bg-surface);
+  --bg-card-solid: var(--bg-surface);
+  --text-muted: var(--text-tertiary);
+
   color-scheme: light;
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
 }
 
 /* ============================================
@@ -115,8 +95,8 @@ body {
   margin: 0;
   display: flex;
   font-family: var(--font-sans);
-  background-color: transparent;
-  color: var(--n-text-color);
+  background-color: var(--bg-app);
+  color: var(--text-primary);
   overflow: hidden;
 }
 

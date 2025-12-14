@@ -10,7 +10,7 @@ export const useProjectStore = defineStore("projects", () => {
   async function fetchProjects() {
     loading.value = true;
     try {
-      projects.value = await api.projects.list();
+      projects.value = (await api.projects.list()) ?? [];
     } catch (error) {
       console.error("Failed to fetch projects", error);
     } finally {
@@ -21,7 +21,7 @@ export const useProjectStore = defineStore("projects", () => {
   async function fetchProjectsByClient(clientId: number) {
     loading.value = true;
     try {
-      projects.value = await api.projects.listByClient(clientId);
+      projects.value = (await api.projects.listByClient(clientId)) ?? [];
     } catch (error) {
       console.error("Failed to fetch projects by client", error);
     } finally {

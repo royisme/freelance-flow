@@ -5,6 +5,7 @@ import { lightThemeOverrides, darkThemeOverrides } from '@/theme'
 import { zhCN, dateZhCN, enUS, dateEnUS } from 'naive-ui'
 import { useAppStore } from '@/stores/app'
 import { useI18n } from 'vue-i18n'
+import { applyThemeToRoot } from '@/theme/tokens'
 
 const appStore = useAppStore()
 const { locale } = useI18n()
@@ -16,6 +17,14 @@ const themeOverrides = computed(() => appStore.theme === 'dark' ? darkThemeOverr
 // Locale Configuration
 const naiveLocale = computed(() => appStore.locale === 'zh-CN' ? zhCN : enUS)
 const naiveDateLocale = computed(() => appStore.locale === 'zh-CN' ? dateZhCN : dateEnUS)
+
+watch(
+  () => appStore.theme,
+  (newTheme) => {
+    applyThemeToRoot(newTheme)
+  },
+  { immediate: true }
+)
 
 // Watch for locale changes to update vue-i18n
 watch(

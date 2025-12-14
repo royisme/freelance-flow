@@ -231,7 +231,7 @@ function rowClassName(row: TreeRow) {
 </script>
 
 <template>
-  <PageContainer>
+  <PageContainer fill>
     <PageHeader :title="t('clients.title')" :subtitle="t('clients.subtitle')">
       <template #extra>
         <n-button type="primary" @click="handleNewClient">

@@ -1,6 +1,9 @@
 import { vi } from "vitest";
 import { defineComponent, h } from "vue";
 import { mockDialog, mockMessage } from "@/test-utils/naive";
+import { applyThemeToRoot } from "@/theme/tokens";
+
+applyThemeToRoot("light");
 
 const Stub = (name: string) =>
   defineComponent({

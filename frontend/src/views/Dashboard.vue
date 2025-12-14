@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onMounted, computed } from 'vue'
-import { NCard, NStatistic, NGrid, NGridItem, NList, NListItem, NTag, NIcon } from 'naive-ui'
+import { NCard, NStatistic, NGrid, NGridItem, NList, NListItem, NThing, NTag, NIcon } from 'naive-ui'
 import { useDashboardStore } from '@/stores/dashboard'
 import { useAuthStore } from '@/stores/auth'
 import PageContainer from '@/components/PageContainer.vue'
@@ -84,33 +84,26 @@ onMounted(() => {
     <div class="section-container">
       <div class="section-header">
         <h2 class="section-title">{{ t('dashboard.recentActivity.title') }}</h2>
-        <n-tag :bordered="false" type="default" size="small" class="clickable-tag">{{
-          t('dashboard.recentActivity.viewAll')
-          }}</n-tag>
+
       </div>
 
       <n-card :bordered="true" class="activity-card-container"
-        :content-style="{ padding: 0, height: '100%', display: 'flex', flexDirection: 'column' }">
+        :content-style="{ padding: 'var(--space-2)', height: '100%', display: 'flex', flexDirection: 'column' }">
         <div class="activity-scroll-container">
           <n-list hoverable clickable>
             <n-list-item v-for="activity in store.recentActivities" :key="activity.id">
-              <div class="activity-item">
-                <div class="activity-left">
-                  <div class="activity-icon-bg">
-                    <n-icon size="18" color="#EA580C">
-                      <ClockCircleOutlined />
-                    </n-icon>
-                  </div>
-                  <div class="activity-content">
-                    <div class="activity-title">{{ activity.project }}</div>
-                    <div class="activity-desc">{{ activity.date }} · {{ activity.description }}</div>
-                  </div>
+              <template #prefix>
+                <div class="activity-icon-bg">
+                  <n-icon size="18" color="#EA580C">
+                    <ClockCircleOutlined />
+                  </n-icon>
                 </div>
-                <div class="activity-right">
-                  <span class="hours-badge">{{ t('dashboard.recentActivity.hoursLabel', { hours: activity.hours })
-                    }}</span>
-                </div>
-              </div>
+              </template>
+              <n-thing :title="activity.project" :description="`${activity.date} · ${activity.description}`" />
+              <template #suffix>
+                <span class="hours-badge">{{ t('dashboard.recentActivity.hoursLabel', { hours: activity.hours })
+                }}</span>
+              </template>
             </n-list-item>
 
             <div v-if="store.recentActivities.length === 0" class="empty-state">
@@ -192,40 +185,16 @@ onMounted(() => {
   color: var(--n-text-color-2);
 }
 
-/* Recent Activity List */
-.activity-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: var(--space-4) var(--space-6);
-}
-
-.activity-left {
-  display: flex;
-  align-items: center;
-  gap: var(--space-4);
-}
-
+/* Recent Activity List - prefix icon */
 .activity-icon-bg {
-  width: 40px;
-  height: 40px;
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
   border-radius: var(--radius-full);
   background-color: var(--color-warning-bg);
   display: flex;
   align-items: center;
   justify-content: center;
-}
-
-.activity-title {
-  font-weight: 600;
-  color: var(--n-text-color);
-  font-size: var(--text-base);
-}
-
-.activity-desc {
-  color: var(--n-text-color-3);
-  font-size: var(--text-sm);
-  margin-top: 2px;
 }
 
 .hours-badge {
@@ -236,6 +205,7 @@ onMounted(() => {
   background-color: var(--n-action-color);
   padding: var(--space-2) var(--space-3);
   border-radius: var(--radius-full);
+  white-space: nowrap;
 }
 
 .empty-state {

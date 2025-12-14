@@ -14,8 +14,12 @@ defineProps<{
 
 <style scoped>
 .page-container {
+  box-sizing: border-box;
   height: 100%;
-  padding: 0 4px 0 0;
+  padding: var(--space-6);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-xl);
 }
 
 /* Fill mode - content uses flexbox to fill available space */
