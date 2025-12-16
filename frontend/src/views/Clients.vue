@@ -4,8 +4,6 @@ import { h, onMounted, computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { toast } from 'vue-sonner'
 import type { ColumnDef } from '@tanstack/vue-table'
-import PageContainer from '@/components/PageContainer.vue'
-import PageHeader from '@/components/PageHeader.vue'
 import ClientFormModal from '@/components/ClientFormModal.vue'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -240,17 +238,17 @@ const columns: ColumnDef<TreeRow>[] = [
 </script>
 
 <template>
-  <PageContainer>
-    <PageHeader :title="t('clients.title')" :description="t('clients.subtitle')">
-      <template #actions>
-        <Button @click="handleNewClient">
-          <Plus class="w-4 h-4 mr-2" />
-          {{ t('clients.addClient') }}
-        </Button>
-      </template>
-    </PageHeader>
+  <div class="space-y-6">
+    <!-- Header Actions -->
+    <div class="flex items-center justify-end">
+      <Button @click="handleNewClient">
+        <Plus class="w-4 h-4 mr-2" />
+        {{ t('clients.addClient') }}
+      </Button>
+    </div>
 
-    <div class="space-y-4">
+    <!-- Content -->
+    <div class="border rounded-xl bg-card text-card-foreground shadow-sm">
       <DataTable :columns="columns" :data="treeData" :loading="loading" :get-sub-rows="(row) => row.children" />
     </div>
 
@@ -276,7 +274,7 @@ const columns: ColumnDef<TreeRow>[] = [
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
-  </PageContainer>
+  </div>
 </template>
 
 <style scoped>

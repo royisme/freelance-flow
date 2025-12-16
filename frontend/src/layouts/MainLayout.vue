@@ -32,6 +32,12 @@ import {
     SidebarTrigger
 } from '@/components/ui/sidebar'
 import { Separator } from '@/components/ui/separator'
+import {
+    Breadcrumb,
+    BreadcrumbItem,
+    BreadcrumbList,
+    BreadcrumbPage,
+} from '@/components/ui/breadcrumb'
 import AppSidebar from '@/components/app-sidebar/AppSidebar.vue'
 import type { NavItem } from '@/components/app-sidebar/types'
 
@@ -42,6 +48,39 @@ const authStore = useAuthStore()
 const statusBarStore = useStatusBarStore()
 const settingsStore = useSettingsStore()
 const { t } = useI18n()
+
+const currentBreadcrumbTitle = computed(() => {
+    // 1. Try module based title
+    if (route.meta.moduleID) {
+        // Find module
+        const mod = allModules.find(m => m.id === route.meta.moduleID)
+        // For sub-pages (e.g. settings/general), strict match is needed?
+        // Actually moduleID is shared by all pages in module.
+        // So for "settings", we might want the specific child?
+        // But for now, let's just use the module label or child label if possible?
+
+        // Improve: find the specific nav item that matches the route?
+        if (mod) {
+            // If module has direct nav
+            if (mod.nav && !mod.nav.children) {
+                return t(mod.nav.labelKey)
+            }
+            // If module has children logic (Settings)
+            if (mod.id === 'settings') {
+                // Return "Settings" or maybe specific page?
+                // For "Settings", let's just return "Settings" for now, or match the child?
+                // The settings children keys are `settings/general`.
+                // For simplicity, return module label which is "Settings".
+                return t(mod.nav?.labelKey || '')
+            }
+            if (mod.nav) {
+                return t(mod.nav.labelKey)
+            }
+        }
+    }
+    // 2. Fallback
+    return ''
+})
 
 // Locale Options
 const localeOptions = [
@@ -125,6 +164,15 @@ onMounted(() => {
                 <div class="flex items-center gap-2 px-4">
                     <SidebarTrigger class="-ml-1" />
                     <Separator orientation="vertical" class="mr-2 h-4" />
+                    <Breadcrumb>
+                        <BreadcrumbList>
+                            <BreadcrumbItem>
+                                <BreadcrumbPage>
+                                    {{ currentBreadcrumbTitle }}
+                                </BreadcrumbPage>
+                            </BreadcrumbItem>
+                        </BreadcrumbList>
+                    </Breadcrumb>
                 </div>
 
                 <div class="ml-auto flex items-center gap-4">
@@ -163,7 +211,7 @@ onMounted(() => {
             </header>
 
             <!-- Main Scrollable Area -->
-            <div class="flex-1 flex flex-col gap-4 p-4 pt-0 overflow-auto">
+            <div class="flex-1 flex flex-col gap-4 p-6 md:p-8 pt-0 overflow-auto">
                 <RouterView />
             </div>
 
@@ -172,7 +220,7 @@ onMounted(() => {
                 <div class="flex items-center gap-3">
                     <span class="font-medium">{{ t('footer.statusBar') }}</span>
                     <span>{{ t('footer.monthlyHours') }} <strong class="text-primary">{{ statusBarStore.monthHoursLabel
-                    }}</strong></span>
+                            }}</strong></span>
                     <span class="text-muted-foreground/40">|</span>
                     <span>{{ t('footer.uninvoiced') }} <strong class="text-primary">{{
                         statusBarStore.uninvoicedTotalLabel }}</strong></span>

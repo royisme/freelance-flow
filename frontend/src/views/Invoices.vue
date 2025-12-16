@@ -1,7 +1,5 @@
 <script setup lang="ts">
 import { onMounted, ref, computed } from 'vue'
-import PageContainer from '@/components/PageContainer.vue'
-import PageHeader from '@/components/PageHeader.vue'
 import InvoiceFormModal from '@/components/InvoiceFormModal.vue'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -228,15 +226,14 @@ function formatCurrency(value: number) {
 </script>
 
 <template>
-  <PageContainer>
-    <PageHeader :title="t('invoices.title')" :subtitle="t('invoices.subtitle')">
-      <template #extra>
-        <Button class="shadow-lg shadow-primary/30" @click="handleNewInvoice">
-          <Plus class="w-4 h-4 mr-2" />
-          {{ t('invoices.createInvoice') }}
-        </Button>
-      </template>
-    </PageHeader>
+  <div class="space-y-6">
+    <!-- Header Actions -->
+    <div class="flex items-center justify-end">
+      <Button class="shadow-lg shadow-primary/30" @click="handleNewInvoice">
+        <Plus class="w-4 h-4 mr-2" />
+        {{ t('invoices.createInvoice') }}
+      </Button>
+    </div>
 
     <InvoiceFormModal v-model:show="showModal" :invoice="editingInvoice" :clients="clients"
       @create="handleCreateInvoiceFromEntries" @update="handleUpdateInvoice" />
@@ -414,5 +411,5 @@ function formatCurrency(value: number) {
         </DialogFooter>
       </DialogContent>
     </Dialog>
-  </PageContainer>
+  </div>
 </template>

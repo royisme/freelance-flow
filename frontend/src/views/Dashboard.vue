@@ -2,8 +2,6 @@
 import { onMounted, computed } from 'vue'
 import { useDashboardStore } from '@/stores/dashboard'
 import { useAuthStore } from '@/stores/auth'
-import PageContainer from '@/components/PageContainer.vue'
-import PageHeader from '@/components/PageHeader.vue'
 import { Clock, DollarSign, TrendingUp, Calendar } from 'lucide-vue-next'
 import { useI18n } from 'vue-i18n'
 import { Card, CardContent } from '@/components/ui/card'
@@ -20,11 +18,19 @@ onMounted(() => {
 </script>
 
 <template>
-  <PageContainer fill>
-    <PageHeader :title="t('dashboard.greeting', { name: username })" :subtitle="t('dashboard.weekOverview')" />
+  <div class="space-y-6">
+    <!-- Greeting/Header Section (Optional, or rely on Breadcrumb only? User said "Greeting" in PageHeader) -->
+    <!-- Since PageHeader contained Greeting which is personalized, maybe we want to keep it as a simple text block? -->
+    <!-- Breadcrumb handles "Dashboard", but "Good morning, Roy" was in the header. -->
+    <!-- Let's keep the greeting as a semantic header on the canvas. -->
+
+    <div>
+      <h2 class="text-3xl font-bold tracking-tight">{{ t('dashboard.greeting', { name: username }) }}</h2>
+      <p class="text-muted-foreground">{{ t('dashboard.weekOverview') }}</p>
+    </div>
 
     <!-- Key Metrics Cards -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
       <!-- Weekly Hours -->
       <Card class="hover:-translate-y-1 transition-all duration-300 shadow-sm hover:shadow-md">
         <CardContent class="p-6 flex items-center gap-4">
@@ -75,15 +81,14 @@ onMounted(() => {
     </div>
 
     <!-- Recent Activity Section -->
-    <div class="flex-1 min-h-0 flex flex-col">
-      <div class="flex items-center justify-between mb-4">
+    <div class="space-y-4">
+      <div class="flex items-center justify-between">
         <h2 class="text-xl font-semibold tracking-tight">{{ t('dashboard.recentActivity.title') }}</h2>
       </div>
 
-      <Card class="flex-1 flex flex-col min-h-0">
-        <CardContent class="flex-1 p-0 overflow-hidden flex flex-col">
-
-          <div class="flex-1 overflow-y-auto p-4 space-y-1">
+      <Card class="flex-col">
+        <CardContent class="p-0 overflow-hidden flex flex-col">
+          <div class="p-4 space-y-1">
             <template v-if="store.recentActivities.length > 0">
               <div v-for="activity in store.recentActivities" :key="activity.id"
                 class="group flex items-center gap-4 p-3 rounded-lg hover:bg-muted/50 transition-colors cursor-pointer">
@@ -104,7 +109,7 @@ onMounted(() => {
               </div>
             </template>
 
-            <div v-else class="h-full flex flex-col items-center justify-center text-muted-foreground p-8">
+            <div v-else class="flex flex-col items-center justify-center text-muted-foreground p-8">
               <Calendar class="h-12 w-12 mb-4 opacity-20" />
               <p>{{ t('dashboard.recentActivity.empty') }}</p>
             </div>
@@ -112,7 +117,7 @@ onMounted(() => {
         </CardContent>
       </Card>
     </div>
-  </PageContainer>
+  </div>
 </template>
 
 <style scoped>
