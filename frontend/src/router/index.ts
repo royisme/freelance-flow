@@ -1,12 +1,18 @@
 import { createRouter, createWebHashHistory } from "vue-router";
 import { useAuthStore } from "@/stores/auth";
 import { allModules } from "@/modules/registry";
+import { toRouteRecordRaw } from "@/modules/types";
 import type { ModuleID } from "@/modules/types";
 import { useSettingsStore } from "@/stores/settings";
-import { isModuleIDEnabled, normalizeModuleOverrides } from "@/modules/registry";
+import {
+  isModuleIDEnabled,
+  normalizeModuleOverrides,
+} from "@/modules/registry";
 
-// Auth views (no lazy loading for faster initial load)
+// Static imports for auth views
 import Splash from "@/views/Splash.vue";
+import Login from "@/views/Login.vue";
+import Register from "@/views/Register.vue";
 
 const routes = [
   // Auth routes (no auth required)
@@ -21,17 +27,17 @@ const routes = [
   },
   {
     path: "/login",
-    component: () => import("@/views/Login.vue"),
+    component: Login,
     meta: { requiresAuth: false, layout: "auth" },
   },
   {
     path: "/register",
-    component: () => import("@/views/Register.vue"),
+    component: Register,
     meta: { requiresAuth: false, layout: "auth" },
   },
 
   // Main app routes (auth required) are provided by module registry
-  ...allModules.flatMap((m) => m.routes),
+  ...allModules.flatMap((m) => m.routes.map(toRouteRecordRaw)),
 ];
 
 const router = createRouter({
@@ -76,7 +82,9 @@ router.beforeEach((to, _from, next) => {
       .find((v) => v !== undefined);
 
     if (to.meta.requiresAuth && moduleID) {
-      const overrides = normalizeModuleOverrides(settingsStore.settings?.moduleOverrides);
+      const overrides = normalizeModuleOverrides(
+        settingsStore.settings?.moduleOverrides
+      );
       if (!isModuleIDEnabled(moduleID, overrides)) {
         next("/dashboard");
         return;

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref, h } from 'vue'
+import { onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import {
   Table,
@@ -12,7 +12,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
-import { PlusOutlined } from '@vicons/antd'
+import { Plus } from 'lucide-vue-next'
 import { api } from '@/api'
 import type { FinanceAccount } from '@/types/finance'
 import { toast } from 'vue-sonner'
@@ -53,9 +53,7 @@ onMounted(() => {
     <div class="page-header flex justify-between items-center">
       <h1 class="page-title text-2xl font-bold">{{ t('finance.accounts.title') }}</h1>
       <Button>
-        <template #icon>
-          <PlusOutlined class="mr-2 h-4 w-4" />
-        </template>
+        <Plus class="mr-2 h-4 w-4" />
         {{ t('finance.accounts.addAccount') }}
       </Button>
     </div>

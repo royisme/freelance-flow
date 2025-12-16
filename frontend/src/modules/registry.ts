@@ -3,19 +3,37 @@ import type {
   ModuleID,
   ModuleMessages,
   ModuleNavItem,
+  ModuleRoute,
   ModuleSettingsPage,
 } from "@/modules/types";
 import { financeModule } from "@/modules/finance/module";
-import type { RouteRecordRaw } from "vue-router";
 import {
-  BarChartOutlined,
-  ClockCircleOutlined,
-  DashboardOutlined,
-  FileTextOutlined,
-  ProjectOutlined,
-  SettingOutlined,
-  UserOutlined,
-} from "@vicons/antd";
+  LayoutDashboard,
+  User,
+  FolderKanban,
+  Clock,
+  FileText,
+  BarChart3,
+  Settings,
+} from "lucide-vue-next";
+
+// Static imports for all view components
+import Dashboard from "@/views/Dashboard.vue";
+import Clients from "@/views/Clients.vue";
+import Projects from "@/views/Projects.vue";
+import ProjectDetail from "@/views/ProjectDetail.vue";
+import Timesheet from "@/views/Timesheet.vue";
+import Invoices from "@/views/Invoices.vue";
+import Reports from "@/views/Reports.vue";
+import SettingsLayout from "@/views/settings/SettingsLayout.vue";
+import GeneralSettings from "@/views/settings/GeneralSettings.vue";
+import ProfileSettings from "@/views/settings/ProfileSettings.vue";
+import InvoiceSettings from "@/views/settings/InvoiceSettings.vue";
+import EmailSettings from "@/views/settings/EmailSettings.vue";
+
+// ============================================================================
+// Module Input Types
+// ============================================================================
 
 export type EnabledModulesInput = {
   moduleOverrides?: Partial<Record<ModuleID, boolean>> | null;
@@ -33,6 +51,10 @@ export function normalizeModuleOverrides(
   return Object.keys(out).length > 0 ? out : null;
 }
 
+// ============================================================================
+// Core Modules Definition
+// ============================================================================
+
 const baseModules: AppModule[] = [
   {
     id: "dashboard",
@@ -41,12 +63,12 @@ const baseModules: AppModule[] = [
     nav: {
       labelKey: "nav.dashboard",
       key: "dashboard",
-      icon: DashboardOutlined,
+      icon: LayoutDashboard,
     },
     routes: [
       {
         path: "/dashboard",
-        component: () => import("@/views/Dashboard.vue"),
+        component: Dashboard,
         meta: { requiresAuth: true, layout: "main", moduleID: "dashboard" },
       },
     ],
@@ -55,11 +77,11 @@ const baseModules: AppModule[] = [
     id: "clients",
     enabledByDefault: true,
     toggleable: false,
-    nav: { labelKey: "nav.clients", key: "clients", icon: UserOutlined },
+    nav: { labelKey: "nav.clients", key: "clients", icon: User },
     routes: [
       {
         path: "/clients",
-        component: () => import("@/views/Clients.vue"),
+        component: Clients,
         meta: { requiresAuth: true, layout: "main", moduleID: "clients" },
       },
     ],
@@ -68,16 +90,16 @@ const baseModules: AppModule[] = [
     id: "projects",
     enabledByDefault: true,
     toggleable: false,
-    nav: { labelKey: "nav.projects", key: "projects", icon: ProjectOutlined },
+    nav: { labelKey: "nav.projects", key: "projects", icon: FolderKanban },
     routes: [
       {
         path: "/projects",
-        component: () => import("@/views/Projects.vue"),
+        component: Projects,
         meta: { requiresAuth: true, layout: "main", moduleID: "projects" },
       },
       {
         path: "/projects/:id",
-        component: () => import("@/views/ProjectDetail.vue"),
+        component: ProjectDetail,
         meta: { requiresAuth: true, layout: "main", moduleID: "projects" },
       },
     ],
@@ -89,12 +111,12 @@ const baseModules: AppModule[] = [
     nav: {
       labelKey: "nav.timesheet",
       key: "timesheet",
-      icon: ClockCircleOutlined,
+      icon: Clock,
     },
     routes: [
       {
         path: "/timesheet",
-        component: () => import("@/views/Timesheet.vue"),
+        component: Timesheet,
         meta: { requiresAuth: true, layout: "main", moduleID: "timesheet" },
       },
     ],
@@ -103,11 +125,11 @@ const baseModules: AppModule[] = [
     id: "invoices",
     enabledByDefault: true,
     toggleable: false,
-    nav: { labelKey: "nav.invoices", key: "invoices", icon: FileTextOutlined },
+    nav: { labelKey: "nav.invoices", key: "invoices", icon: FileText },
     routes: [
       {
         path: "/invoices",
-        component: () => import("@/views/Invoices.vue"),
+        component: Invoices,
         meta: { requiresAuth: true, layout: "main", moduleID: "invoices" },
       },
     ],
@@ -116,63 +138,77 @@ const baseModules: AppModule[] = [
     id: "reports",
     enabledByDefault: true,
     toggleable: false,
-    nav: { labelKey: "nav.reports", key: "reports", icon: BarChartOutlined },
+    nav: { labelKey: "nav.reports", key: "reports", icon: BarChart3 },
     routes: [
       {
         path: "/reports",
-        component: () => import("@/views/Reports.vue"),
+        component: Reports,
         meta: { requiresAuth: true, layout: "main", moduleID: "reports" },
       },
     ],
   },
 ];
 
-const settingsBaseChildren: Array<{
-  key: string;
-  order: number;
-  labelKey: string;
-  component: RouteRecordRaw["component"];
-}> = [
+// ============================================================================
+// Settings Module (Special - Aggregates settings from other modules)
+// ============================================================================
+
+/**
+ * Core settings pages that belong to the settings module itself
+ */
+const coreSettingsPages: ModuleSettingsPage[] = [
   {
     key: "general",
     order: 10,
     labelKey: "settings.general.title",
-    component: () => import("@/views/settings/GeneralSettings.vue"),
+    component: GeneralSettings,
+    moduleID: "settings",
   },
   {
     key: "profile",
     order: 20,
     labelKey: "settings.profile.title",
-    component: () => import("@/views/settings/ProfileSettings.vue"),
+    component: ProfileSettings,
+    moduleID: "settings",
   },
   {
     key: "invoice",
     order: 30,
     labelKey: "settings.invoice.title",
-    component: () => import("@/views/settings/InvoiceSettings.vue"),
+    component: InvoiceSettings,
+    moduleID: "settings",
   },
   {
     key: "email",
     order: 40,
     labelKey: "settings.email.title",
-    component: () => import("@/views/settings/EmailSettings.vue"),
+    component: EmailSettings,
+    moduleID: "settings",
   },
 ];
 
+/**
+ * Build the settings module by aggregating core pages and contributed pages from other modules
+ */
 function createSettingsModule(contribPages: ModuleSettingsPage[]): AppModule {
-  const pages = [...contribPages].sort((a, b) => a.order - b.order);
-  const settingsChildren = [
-    { path: "", redirect: "/settings/general" },
-    ...settingsBaseChildren.map((p) => ({
-      path: p.key,
-      component: p.component,
-    })),
-    ...pages.map((p) => ({
-      path: p.key,
-      component: p.component,
-      meta: { moduleID: p.moduleID },
-    })),
-  ];
+  // Merge core and contributed pages, then sort by order
+  const allPages = [...coreSettingsPages, ...contribPages].sort(
+    (a, b) => a.order - b.order
+  );
+
+  // Build child routes for settings
+  const childRoutes: ModuleRoute[] = allPages.map((page) => ({
+    path: page.key,
+    component: page.component,
+    meta: { moduleID: page.moduleID },
+  }));
+
+  // Build nav children
+  const navChildren: ModuleNavItem[] = allPages.map((page) => ({
+    key: `settings/${page.key}`,
+    labelKey: page.labelKey,
+    moduleID: page.moduleID,
+  }));
 
   return {
     id: "settings",
@@ -181,30 +217,30 @@ function createSettingsModule(contribPages: ModuleSettingsPage[]): AppModule {
     nav: {
       labelKey: "nav.settings",
       key: "settings",
-      icon: SettingOutlined,
-      children: [
-        ...settingsBaseChildren.map((p) => ({
-          key: `settings/${p.key}`,
-          labelKey: p.labelKey,
-          moduleID: "settings",
-        })),
-        ...pages.map((p) => ({
-          key: `settings/${p.key}`,
-          labelKey: p.labelKey,
-          moduleID: p.moduleID,
-        })),
-      ],
+      icon: Settings,
+      children: navChildren,
     },
     routes: [
       {
         path: "/settings",
-        component: () => import("@/views/settings/SettingsLayout.vue"),
+        component: SettingsLayout,
         meta: { requiresAuth: true, layout: "main", moduleID: "settings" },
-        children: settingsChildren,
+        children: [
+          {
+            path: "",
+            redirect: "/settings/general",
+            component: GeneralSettings,
+          },
+          ...childRoutes,
+        ],
       },
     ],
   };
 }
+
+// ============================================================================
+// Module Registry
+// ============================================================================
 
 const nonSettingsModules: AppModule[] = [...baseModules, financeModule];
 
@@ -214,6 +250,10 @@ export const allModules: AppModule[] = [
     nonSettingsModules.flatMap((m) => m.settingsPages ?? [])
   ),
 ];
+
+// ============================================================================
+// Module Query Functions
+// ============================================================================
 
 export function isModuleEnabled(
   module: AppModule,

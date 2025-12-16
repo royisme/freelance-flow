@@ -1,6 +1,16 @@
 import type { AppModule } from "@/modules/types";
 import { financeMessages } from "@/modules/finance/i18n";
-import { WalletOutlined } from "@vicons/antd";
+import { Wallet } from "lucide-vue-next";
+
+// Static imports for finance views
+import FinanceLayout from "@/views/finance/FinanceLayout.vue";
+import FinanceOverview from "@/views/finance/index.vue";
+import FinanceAccounts from "@/views/finance/accounts/index.vue";
+import FinanceTransactions from "@/views/finance/transactions/index.vue";
+import FinanceImport from "@/views/finance/import/index.vue";
+import FinanceCategories from "@/views/finance/categories/index.vue";
+import FinanceReports from "@/views/finance/reports/index.vue";
+import FinanceSettings from "@/views/settings/FinanceSettings.vue";
 
 export const financeModule: AppModule = {
   id: "finance",
@@ -9,35 +19,53 @@ export const financeModule: AppModule = {
   nav: {
     labelKey: "nav.finance",
     key: "finance",
-    icon: WalletOutlined,
+    icon: Wallet,
     children: [
-      { labelKey: "finance.nav.overview", key: "finance/overview", moduleID: "finance" },
-      { labelKey: "finance.nav.accounts", key: "finance/accounts", moduleID: "finance" },
-      { labelKey: "finance.nav.transactions", key: "finance/transactions", moduleID: "finance" },
-      { labelKey: "finance.nav.import", key: "finance/import", moduleID: "finance" },
-      { labelKey: "finance.nav.categories", key: "finance/categories", moduleID: "finance" },
-      { labelKey: "finance.nav.reports", key: "finance/reports", moduleID: "finance" },
+      {
+        labelKey: "finance.nav.overview",
+        key: "finance/overview",
+        moduleID: "finance",
+      },
+      {
+        labelKey: "finance.nav.accounts",
+        key: "finance/accounts",
+        moduleID: "finance",
+      },
+      {
+        labelKey: "finance.nav.transactions",
+        key: "finance/transactions",
+        moduleID: "finance",
+      },
+      {
+        labelKey: "finance.nav.import",
+        key: "finance/import",
+        moduleID: "finance",
+      },
+      {
+        labelKey: "finance.nav.categories",
+        key: "finance/categories",
+        moduleID: "finance",
+      },
+      {
+        labelKey: "finance.nav.reports",
+        key: "finance/reports",
+        moduleID: "finance",
+      },
     ],
   },
   routes: [
     {
       path: "/finance",
-      component: () => import("@/views/finance/FinanceLayout.vue"),
+      component: FinanceLayout,
       meta: { requiresAuth: true, layout: "main", moduleID: "finance" },
       children: [
-        { path: "", redirect: "/finance/overview" },
-        { path: "overview", component: () => import("@/views/finance/index.vue") },
-        { path: "accounts", component: () => import("@/views/finance/accounts/index.vue") },
-        {
-          path: "transactions",
-          component: () => import("@/views/finance/transactions/index.vue"),
-        },
-        { path: "import", component: () => import("@/views/finance/import/index.vue") },
-        {
-          path: "categories",
-          component: () => import("@/views/finance/categories/index.vue"),
-        },
-        { path: "reports", component: () => import("@/views/finance/reports/index.vue") },
+        { path: "", redirect: "/finance/overview", component: FinanceOverview },
+        { path: "overview", component: FinanceOverview },
+        { path: "accounts", component: FinanceAccounts },
+        { path: "transactions", component: FinanceTransactions },
+        { path: "import", component: FinanceImport },
+        { path: "categories", component: FinanceCategories },
+        { path: "reports", component: FinanceReports },
       ],
     },
   ],
@@ -45,7 +73,7 @@ export const financeModule: AppModule = {
     {
       key: "finance",
       labelKey: "settings.finance.title",
-      component: () => import("@/views/settings/FinanceSettings.vue"),
+      component: FinanceSettings,
       order: 50,
       moduleID: "finance",
     },

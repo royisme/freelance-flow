@@ -102,7 +102,6 @@ onMounted(async () => {
   // If user is already authenticated, auto-redirect to dashboard
   if (authStore.isAuthenticated) {
     isAutoRedirecting.value = true
-    void import('@/views/Dashboard.vue')
     setTimeout(() => {
       const last = localStorage.getItem("lastAuthedRoute");
       if (
@@ -119,11 +118,7 @@ onMounted(async () => {
     return
   }
 
-  if (authStore.usersList.length > 0) {
-    void import('@/views/Login.vue')
-  } else {
-    void import('@/views/Register.vue')
-  }
+  // No prefetching needed - using static imports for desktop app
 })
 
 onUnmounted(() => {
