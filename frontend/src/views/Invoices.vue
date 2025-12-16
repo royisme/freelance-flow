@@ -226,9 +226,9 @@ function formatCurrency(value: number) {
 </script>
 
 <template>
-  <div class="space-y-6">
+  <div class="h-full flex flex-col min-h-0 gap-4">
     <!-- Header Actions -->
-    <div class="flex items-center justify-end">
+    <div class="shrink-0 flex items-center justify-end">
       <Button class="shadow-lg shadow-primary/30" @click="handleNewInvoice">
         <Plus class="w-4 h-4 mr-2" />
         {{ t('invoices.createInvoice') }}
@@ -238,81 +238,80 @@ function formatCurrency(value: number) {
     <InvoiceFormModal v-model:show="showModal" :invoice="editingInvoice" :clients="clients"
       @create="handleCreateInvoiceFromEntries" @update="handleUpdateInvoice" />
 
-    <!-- Content -->
-    <div class="space-y-6">
-      <!-- Stats Grid -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <!-- Stats Grid -->
+    <div class="shrink-0 grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div
+        class="stat-card primary flex items-center gap-5 p-5 rounded-2xl border bg-gradient-to-br from-blue-50 to-white dark:from-blue-950/20 dark:to-card border-blue-200/50 dark:border-blue-900/50 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md">
         <div
-          class="stat-card primary flex items-center gap-5 p-6 rounded-2xl border bg-linear-to-br from-blue-50 to-white dark:from-blue-950/20 dark:to-card border-blue-200/50 dark:border-blue-900/50 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md">
-          <div
-            class="flex items-center justify-center size-12 rounded-xl bg-white dark:bg-blue-900/30 shadow-sm text-primary">
-            <DollarSign class="size-6" />
-          </div>
-          <div>
-            <p class="text-sm text-muted-foreground">{{ t('invoices.stats.outstandingAmount') }}</p>
-            <p class="text-2xl font-bold tabular-nums">
-              {{ formatCurrency(stats.totalDue) }}
-              <span class="text-sm font-medium text-muted-foreground ml-1">USD</span>
-            </p>
-          </div>
+          class="flex items-center justify-center size-12 rounded-xl bg-white dark:bg-blue-900/30 shadow-sm text-primary">
+          <DollarSign class="size-6" />
         </div>
-
-        <div
-          class="stat-card secondary flex items-center gap-5 p-6 rounded-2xl border bg-linear-to-br from-gray-50 to-white dark:from-gray-900/20 dark:to-card border-border shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md">
-          <div
-            class="flex items-center justify-center size-12 rounded-xl bg-white dark:bg-gray-800/50 shadow-sm text-muted-foreground">
-            <FileText class="size-6" />
-          </div>
-          <div>
-            <p class="text-sm text-muted-foreground">{{ t('invoices.stats.totalInvoices') }}</p>
-            <p class="text-2xl font-bold tabular-nums">{{ enrichedInvoices.length }}</p>
-          </div>
+        <div>
+          <p class="text-sm text-muted-foreground">{{ t('invoices.stats.outstandingAmount') }}</p>
+          <p class="text-2xl font-bold tabular-nums">
+            {{ formatCurrency(stats.totalDue) }}
+            <span class="text-sm font-medium text-muted-foreground ml-1">USD</span>
+          </p>
         </div>
       </div>
 
-      <!-- Table Section -->
-      <div class="bg-card rounded-2xl p-6 shadow-sm border">
-        <!-- Search and Filter Bar -->
-        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-          <div class="relative max-w-sm w-full">
-            <Search class="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input v-model="searchQuery" :placeholder="t('invoices.searchPlaceholder')" class="pl-9" />
-          </div>
-          <div class="flex gap-2 bg-muted p-1 rounded-lg">
-            <Button variant="ghost" size="sm" :class="{ 'bg-background shadow-sm': statusFilter === null }"
-              @click="statusFilter = null">
-              {{ t('invoices.filter.all') }}
-            </Button>
-            <Button variant="ghost" size="sm" :class="{ 'bg-background shadow-sm': statusFilter === 'draft' }"
-              @click="statusFilter = 'draft'">
-              {{ t('invoices.filter.draft') }}
-            </Button>
-            <Button variant="ghost" size="sm" :class="{ 'bg-background shadow-sm': statusFilter === 'sent' }"
-              @click="statusFilter = 'sent'">
-              {{ t('invoices.filter.sent') }}
-            </Button>
-          </div>
+      <div
+        class="stat-card secondary flex items-center gap-5 p-5 rounded-2xl border bg-gradient-to-br from-gray-50 to-white dark:from-gray-900/20 dark:to-card border-border shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md">
+        <div
+          class="flex items-center justify-center size-12 rounded-xl bg-white dark:bg-gray-800/50 shadow-sm text-muted-foreground">
+          <FileText class="size-6" />
         </div>
-
-        <!-- Loading State -->
-        <div v-if="loading" class="flex justify-center items-center py-12">
-          <Loader2 class="size-8 animate-spin text-muted-foreground" />
+        <div>
+          <p class="text-sm text-muted-foreground">{{ t('invoices.stats.totalInvoices') }}</p>
+          <p class="text-2xl font-bold tabular-nums">{{ enrichedInvoices.length }}</p>
         </div>
+      </div>
+    </div>
 
-        <!-- Empty State -->
-        <div v-else-if="filteredInvoices.length === 0"
-          class="flex flex-col items-center justify-center py-12 border-2 border-dashed rounded-lg bg-muted/30">
-          <FileText class="size-12 text-muted-foreground/50 mb-4" />
-          <p class="text-muted-foreground mb-4">
-            {{ hasActiveFilters ? t('invoices.empty.noMatch') : t('invoices.empty.description') }}
-          </p>
-          <Button v-if="!hasActiveFilters" variant="outline" size="sm" @click="handleNewInvoice">
-            {{ t('invoices.empty.action') }}
+    <!-- Table Section -->
+    <div class="flex-1 min-h-0 bg-card rounded-2xl p-4 shadow-sm border flex flex-col overflow-hidden">
+      <!-- Search and Filter Bar -->
+      <div class="shrink-0 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
+        <div class="relative max-w-sm w-full">
+          <Search class="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input v-model="searchQuery" :placeholder="t('invoices.searchPlaceholder')" class="pl-9" />
+        </div>
+        <div class="flex gap-2 bg-muted p-1 rounded-lg">
+          <Button variant="ghost" size="sm" :class="{ 'bg-background shadow-sm': statusFilter === null }"
+            @click="statusFilter = null">
+            {{ t('invoices.filter.all') }}
+          </Button>
+          <Button variant="ghost" size="sm" :class="{ 'bg-background shadow-sm': statusFilter === 'draft' }"
+            @click="statusFilter = 'draft'">
+            {{ t('invoices.filter.draft') }}
+          </Button>
+          <Button variant="ghost" size="sm" :class="{ 'bg-background shadow-sm': statusFilter === 'sent' }"
+            @click="statusFilter = 'sent'">
+            {{ t('invoices.filter.sent') }}
           </Button>
         </div>
+      </div>
 
-        <!-- Table -->
-        <Table v-else>
+      <!-- Loading State -->
+      <div v-if="loading" class="flex-1 flex justify-center items-center">
+        <Loader2 class="size-8 animate-spin text-muted-foreground" />
+      </div>
+
+      <!-- Empty State -->
+      <div v-else-if="filteredInvoices.length === 0"
+        class="flex-1 flex flex-col items-center justify-center border-2 border-dashed rounded-lg bg-muted/30">
+        <FileText class="size-12 text-muted-foreground/50 mb-4" />
+        <p class="text-muted-foreground mb-4">
+          {{ hasActiveFilters ? t('invoices.empty.noMatch') : t('invoices.empty.description') }}
+        </p>
+        <Button v-if="!hasActiveFilters" variant="outline" size="sm" @click="handleNewInvoice">
+          {{ t('invoices.empty.action') }}
+        </Button>
+      </div>
+
+      <!-- Table -->
+      <div v-else class="flex-1 min-h-0 overflow-auto">
+        <Table>
           <TableHeader>
             <TableRow>
               <TableHead class="w-[160px]">{{ t('invoices.columns.invoiceNumber') }}</TableHead>

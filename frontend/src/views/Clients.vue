@@ -238,9 +238,9 @@ const columns: ColumnDef<TreeRow>[] = [
 </script>
 
 <template>
-  <div class="space-y-6">
+  <div class="h-full flex flex-col min-h-0">
     <!-- Header Actions -->
-    <div class="flex items-center justify-end">
+    <div class="shrink-0 flex items-center justify-end mb-4">
       <Button @click="handleNewClient">
         <Plus class="w-4 h-4 mr-2" />
         {{ t('clients.addClient') }}
@@ -248,7 +248,7 @@ const columns: ColumnDef<TreeRow>[] = [
     </div>
 
     <!-- Content -->
-    <div class="border rounded-xl bg-card text-card-foreground shadow-sm">
+    <div class="flex-1 min-h-0 border rounded-xl bg-card text-card-foreground shadow-sm overflow-hidden">
       <DataTable :columns="columns" :data="treeData" :loading="loading" :get-sub-rows="(row) => row.children" />
     </div>
 

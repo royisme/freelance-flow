@@ -224,7 +224,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <PageContainer>
+  <PageContainer :fill="true">
     <PageHeader :title="t('timesheet.title')" :subtitle="t('timesheet.subtitle')" />
 
     <!-- Edit Modal -->
@@ -233,9 +233,9 @@ onMounted(() => {
 
 
     <!-- Time Entries Section -->
-    <Card class="entries-section">
+    <Card class="flex-1 min-h-0 flex flex-col overflow-hidden">
       <!-- Section Header -->
-      <CardHeader>
+      <CardHeader class="shrink-0">
         <div class="section-header flex justify-between items-center">
           <h3 class="text-lg font-semibold">{{ t('timesheet.entries.title') }}</h3>
           <Button variant="ghost" size="sm" @click="handleExportCSV">
@@ -245,9 +245,9 @@ onMounted(() => {
         </div>
       </CardHeader>
 
-      <CardContent>
+      <CardContent class="flex-1 min-h-0 flex flex-col overflow-hidden">
         <!-- Quick Entry Bar -->
-        <QuickTimeEntry :projects="projects" @submit="handleQuickEntry" />
+        <QuickTimeEntry :projects="projects" @submit="handleQuickEntry" class="shrink-0" />
 
         <!-- Data Table -->
         <div v-if="loading" class="loading-state mt-4 flex items-center justify-center p-4">
@@ -262,7 +262,7 @@ onMounted(() => {
         </div>
 
         <template v-else>
-          <div class="rounded-md border mt-4 overflow-hidden">
+          <div class="flex-1 min-h-0 rounded-md border mt-4 overflow-hidden">
             <DataTable :columns="columns" :data="enrichedEntries" />
           </div>
         </template>

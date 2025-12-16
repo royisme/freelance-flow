@@ -211,7 +211,7 @@ onMounted(() => {
             </header>
 
             <!-- Main Scrollable Area -->
-            <div class="flex-1 flex flex-col gap-4 p-6 md:p-8 pt-0 overflow-auto">
+            <div class="flex-1 flex flex-col gap-4 p-4 pt-2 min-h-0 overflow-hidden">
                 <RouterView />
             </div>
 

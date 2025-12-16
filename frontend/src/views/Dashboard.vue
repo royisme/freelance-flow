@@ -18,26 +18,26 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="space-y-6">
+  <div class="h-full flex flex-col min-h-0 gap-4">
     <!-- Greeting/Header Section -->
-    <div>
-      <h2 class="text-3xl font-bold tracking-tight">{{ t('dashboard.greeting', { name: username }) }}</h2>
-      <p class="text-muted-foreground">{{ t('dashboard.weekOverview') }}</p>
+    <div class="shrink-0">
+      <h2 class="text-2xl font-bold tracking-tight">{{ t('dashboard.greeting', { name: username }) }}</h2>
+      <p class="text-muted-foreground text-sm">{{ t('dashboard.weekOverview') }}</p>
     </div>
 
     <!-- Key Metrics Cards -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div class="shrink-0 grid grid-cols-1 md:grid-cols-3 gap-4">
       <!-- Weekly Hours -->
       <Card class="hover:-translate-y-1 transition-all duration-300 shadow-sm hover:shadow-md">
-        <CardContent class="p-6 flex items-center gap-4">
+        <CardContent class="p-4 flex items-center gap-4">
           <div
-            class="h-12 w-12 rounded-full bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center shrink-0">
-            <Clock class="h-6 w-6 text-orange-600 dark:text-orange-400" />
+            class="h-10 w-10 rounded-full bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center shrink-0">
+            <Clock class="h-5 w-5 text-orange-600 dark:text-orange-400" />
           </div>
           <div>
             <p class="text-sm font-medium text-muted-foreground">{{ t('dashboard.metrics.weeklyHours') }}</p>
             <div class="flex items-baseline gap-1">
-              <span class="text-2xl font-bold tracking-tight">{{ store.totalHoursWeek.toFixed(1) }}</span>
+              <span class="text-xl font-bold tracking-tight">{{ store.totalHoursWeek.toFixed(1) }}</span>
               <span class="text-sm text-muted-foreground">{{ t('dashboard.metrics.hoursUnit') }}</span>
             </div>
           </div>
@@ -46,15 +46,15 @@ onMounted(() => {
 
       <!-- Monthly Revenue -->
       <Card class="hover:-translate-y-1 transition-all duration-300 shadow-sm hover:shadow-md">
-        <CardContent class="p-6 flex items-center gap-4">
+        <CardContent class="p-4 flex items-center gap-4">
           <div
-            class="h-12 w-12 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center shrink-0">
-            <DollarSign class="h-6 w-6 text-green-600 dark:text-green-400" />
+            class="h-10 w-10 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center shrink-0">
+            <DollarSign class="h-5 w-5 text-green-600 dark:text-green-400" />
           </div>
           <div>
             <p class="text-sm font-medium text-muted-foreground">{{ t('dashboard.metrics.monthlyRevenue') }}</p>
             <div class="flex items-baseline gap-1">
-              <span class="text-2xl font-bold tracking-tight">{{ store.totalRevenueMonth.toLocaleString() }}</span>
+              <span class="text-xl font-bold tracking-tight">{{ store.totalRevenueMonth.toLocaleString() }}</span>
             </div>
           </div>
         </CardContent>
@@ -62,14 +62,14 @@ onMounted(() => {
 
       <!-- Pending Amount -->
       <Card class="hover:-translate-y-1 transition-all duration-300 shadow-sm hover:shadow-md">
-        <CardContent class="p-6 flex items-center gap-4">
-          <div class="h-12 w-12 rounded-full bg-rose-100 dark:bg-rose-900/30 flex items-center justify-center shrink-0">
-            <TrendingUp class="h-6 w-6 text-rose-600 dark:text-rose-400" />
+        <CardContent class="p-4 flex items-center gap-4">
+          <div class="h-10 w-10 rounded-full bg-rose-100 dark:bg-rose-900/30 flex items-center justify-center shrink-0">
+            <TrendingUp class="h-5 w-5 text-rose-600 dark:text-rose-400" />
           </div>
           <div>
             <p class="text-sm font-medium text-muted-foreground">{{ t('dashboard.metrics.pendingAmount') }}</p>
             <div class="flex items-baseline gap-1">
-              <span class="text-2xl font-bold tracking-tight">{{ store.pendingAmount.toLocaleString() }}</span>
+              <span class="text-xl font-bold tracking-tight">{{ store.pendingAmount.toLocaleString() }}</span>
             </div>
           </div>
         </CardContent>
@@ -77,13 +77,13 @@ onMounted(() => {
     </div>
 
     <!-- Recent Activity Section -->
-    <div class="space-y-4">
-      <div class="flex items-center justify-between">
-        <h2 class="text-xl font-semibold tracking-tight">{{ t('dashboard.recentActivity.title') }}</h2>
+    <div class="flex-1 min-h-0 flex flex-col">
+      <div class="shrink-0 flex items-center justify-between mb-2">
+        <h2 class="text-lg font-semibold tracking-tight">{{ t('dashboard.recentActivity.title') }}</h2>
       </div>
 
-      <Card class="flex-col">
-        <CardContent class="p-0 overflow-hidden flex flex-col">
+      <Card class="flex-1 min-h-0 flex flex-col overflow-hidden">
+        <CardContent class="flex-1 min-h-0 p-0 overflow-auto">
           <div class="p-4 space-y-1">
             <template v-if="store.recentActivities.length > 0">
               <div v-for="activity in store.recentActivities" :key="activity.id"
