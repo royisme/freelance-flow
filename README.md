@@ -12,15 +12,17 @@ A modern desktop application for freelance management, built with Go (Wails) and
 
 ## 🛠️ Tech Stack
 
-- **Backend**: Go 1.25+ (Wails v2)
-- **Frontend**: Vue 3, TypeScript, Naive UI, Pinia
+- **Backend**: Go (Wails v2)
+- **Frontend**: Vue 3, TypeScript, Shadcn Vue, Tailwind CSS
+- **Runtime**: Bun
+- **State Management**: Pinia
 - **Database**: SQLite (Local persistence)
 
 ## 📋 Prerequisites
 
 - **Go**: [Install Go](https://go.dev/doc/install) (1.21+)
 - **Wails**: `go install github.com/wailsapp/wails/v2/cmd/wails@latest`
-- **Node.js / Bun**: [Install Bun](https://bun.sh/) (Recommended) or Node.js
+- **Bun**: [Install Bun](https://bun.sh/)
 
 ## ⚡ Quick Start
 
