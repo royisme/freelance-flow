@@ -1,9 +1,8 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from "vue";
-import PageContainer from "@/components/PageContainer.vue";
-import PageHeader from "@/components/PageHeader.vue";
+
 import { api } from "@/api";
-import type { Client, Project, ReportFilter, ReportOutput, ReportRow } from "@/types";
+import type { Client, Project, ReportFilter, ReportOutput } from "@/types";
 import VChart from "vue-echarts";
 import type { EChartsOption } from "echarts";
 import { useI18n } from "vue-i18n";
@@ -142,23 +141,22 @@ const totalPages = computed(() => {
 </script>
 
 <template>
-  <PageContainer fill>
-    <PageHeader :title="t('reports.title')" :subtitle="t('reports.subtitle')">
-      <template #extra>
-        <div class="flex gap-8">
-          <div class="flex flex-col items-end">
-            <span class="text-xs text-muted-foreground uppercase font-semibold">{{ t('reports.stats.totalHours')
-              }}</span>
-            <span class="text-2xl font-bold">{{ report?.totalHours || 0 }}</span>
-          </div>
-          <div class="flex flex-col items-end">
-            <span class="text-xs text-muted-foreground uppercase font-semibold">{{ t('reports.stats.totalIncome')
-              }}</span>
-            <span class="text-2xl font-bold text-primary">{{ report?.totalIncome || 0 }}</span>
-          </div>
+  <div class="h-full flex flex-col min-h-0">
+    <!-- Header Stats -->
+    <div class="shrink-0 flex justify-end mb-4">
+      <div class="flex gap-8">
+        <div class="flex flex-col items-end">
+          <span class="text-xs text-muted-foreground uppercase font-semibold">{{ t('reports.stats.totalHours')
+          }}</span>
+          <span class="text-2xl font-bold">{{ report?.totalHours || 0 }}</span>
         </div>
-      </template>
-    </PageHeader>
+        <div class="flex flex-col items-end">
+          <span class="text-xs text-muted-foreground uppercase font-semibold">{{ t('reports.stats.totalIncome')
+          }}</span>
+          <span class="text-2xl font-bold text-primary">{{ report?.totalIncome || 0 }}</span>
+        </div>
+      </div>
+    </div>
 
     <div class="flex flex-col gap-4 flex-1 min-h-0">
       <Card class="shrink-0 bg-muted/30 border-0">
@@ -259,7 +257,7 @@ const totalPages = computed(() => {
         </template>
       </div>
     </div>
-  </PageContainer>
+  </div>
 </template>
 
 <style scoped>

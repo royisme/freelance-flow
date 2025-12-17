@@ -1,7 +1,5 @@
 <script setup lang="ts">
 import { h, onMounted, ref, computed } from 'vue'
-import PageContainer from '@/components/PageContainer.vue'
-import PageHeader from '@/components/PageHeader.vue'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 
@@ -165,7 +163,7 @@ const columns = computed<ColumnDef<TimeEntry & { project?: { name: string } }>[]
   },
   {
     id: 'billableAmount',
-    header: ({ column }) => h('div', { class: 'text-right' }, t('timesheet.columns.billable')),
+    header: () => h('div', { class: 'text-right' }, t('timesheet.columns.billable')),
     cell: ({ row }) => {
       if (!row.original.billable) return h('span', { class: 'text-muted-foreground block text-right' }, '-')
       const rate = getProjectRate(row.original.projectId)
@@ -224,9 +222,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <PageContainer :fill="true">
-    <PageHeader :title="t('timesheet.title')" :subtitle="t('timesheet.subtitle')" />
-
+  <div class="h-full flex flex-col min-h-0">
     <!-- Edit Modal -->
     <TimesheetFormModal v-model:show="showModal" :entry="editingEntry" :projects="projects"
       @submit="handleSubmitEntry" />
@@ -263,7 +259,7 @@ onMounted(() => {
       </div>
     </div>
 
-  </PageContainer>
+  </div>
 </template>
 
 <style scoped>

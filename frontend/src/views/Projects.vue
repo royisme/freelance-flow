@@ -10,8 +10,7 @@ import { useProjectStore } from '@/stores/projects'
 import { useClientStore } from '@/stores/clients'
 import type { Project } from '@/types'
 
-import PageContainer from '@/components/PageContainer.vue'
-import PageHeader from '@/components/PageHeader.vue'
+
 import ProjectFormModal from '@/components/ProjectFormModal.vue'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -174,22 +173,22 @@ const columns: ColumnDef<Project>[] = [
 </script>
 
 <template>
-  <PageContainer :fill="true">
-    <PageHeader :title="t('projects.title')" :subtitle="t('projects.subtitle')">
-      <template #extra>
-        <Button @click="handleNewProject">
-          <Plus class="w-4 h-4 mr-2" />
-          {{ t('projects.addProject') }}
-        </Button>
-      </template>
-    </PageHeader>
+  <div class="h-full flex flex-col min-h-0">
+    <!-- Header Actions -->
+    <div class="shrink-0 flex items-center justify-end mb-4">
+      <Button @click="handleNewProject">
+        <Plus class="w-4 h-4 mr-2" />
+        {{ t('projects.addProject') }}
+      </Button>
+    </div>
 
-    <ProjectFormModal v-model:show="showModal" :project="editingProject" :clients="clients"
-      @submit="handleSubmitProject" />
-
+    <!-- Content -->
     <div class="flex-1 min-h-0 overflow-hidden">
       <DataTable :columns="columns" :data="projects" />
     </div>
+
+    <ProjectFormModal v-model:show="showModal" :project="editingProject" :clients="clients"
+      @submit="handleSubmitProject" />
 
     <!-- Delete Confirmation Dialog -->
     <Dialog v-model:open="showDeleteDialog">
@@ -210,5 +209,5 @@ const columns: ColumnDef<Project>[] = [
         </DialogFooter>
       </DialogContent>
     </Dialog>
-  </PageContainer>
+  </div>
 </template>
