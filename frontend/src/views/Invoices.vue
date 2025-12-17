@@ -241,7 +241,7 @@ function formatCurrency(value: number) {
     <!-- Stats Grid -->
     <div class="shrink-0 grid grid-cols-1 md:grid-cols-2 gap-4">
       <div
-        class="stat-card primary flex items-center gap-5 p-5 rounded-2xl border bg-gradient-to-br from-blue-50 to-white dark:from-blue-950/20 dark:to-card border-blue-200/50 dark:border-blue-900/50 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md">
+        class="stat-card primary flex items-center gap-5 p-5 rounded-2xl border bg-linear-to-br from-blue-50 to-white dark:from-blue-950/20 dark:to-card border-blue-200/50 dark:border-blue-900/50 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md">
         <div
           class="flex items-center justify-center size-12 rounded-xl bg-white dark:bg-blue-900/30 shadow-sm text-primary">
           <DollarSign class="size-6" />
@@ -256,7 +256,7 @@ function formatCurrency(value: number) {
       </div>
 
       <div
-        class="stat-card secondary flex items-center gap-5 p-5 rounded-2xl border bg-gradient-to-br from-gray-50 to-white dark:from-gray-900/20 dark:to-card border-border shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md">
+        class="stat-card secondary flex items-center gap-5 p-5 rounded-2xl border bg-linear-to-br from-gray-50 to-white dark:from-gray-900/20 dark:to-card border-border shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md">
         <div
           class="flex items-center justify-center size-12 rounded-xl bg-white dark:bg-gray-800/50 shadow-sm text-muted-foreground">
           <FileText class="size-6" />
