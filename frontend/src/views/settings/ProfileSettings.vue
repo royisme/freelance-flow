@@ -1,9 +1,8 @@
 <script setup lang="ts">
-import { onMounted, ref } from "vue";
+import { ref, computed } from "vue";
 import { RefreshCw, Upload } from "lucide-vue-next";
 import { useI18n } from "vue-i18n";
 import { toast } from "vue-sonner";
-import { useForm } from "vee-validate";
 import { toTypedSchema } from "@vee-validate/zod";
 
 import { useAuthStore } from "@/stores/auth";
@@ -20,6 +19,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import {
+  Form,
   FormControl,
   FormField,
   FormItem,
@@ -40,55 +40,45 @@ const { t } = useI18n();
 
 // Profile Form
 const profileFormSchema = toTypedSchema(profileSettingsSchema);
-const profileForm = useForm({
-  validationSchema: profileFormSchema,
-});
-
-// Password Form
 const passwordFormSchema = toTypedSchema(changePasswordSchema);
-const passwordForm = useForm({
-  validationSchema: passwordFormSchema,
-});
 
 const fileInputRef = ref<HTMLInputElement | null>(null);
 const accountSaving = ref(false);
 
-onMounted(() => {
-  if (authStore.currentUser) {
-    profileForm.setValues({
-      username: authStore.currentUser.username,
-      email: authStore.currentUser.email,
-      avatarUrl: authStore.currentUser.avatarUrl,
-    });
-  }
-});
+// Computed initial values that update when currentUser changes
+const profileInitialValues = computed(() => ({
+  username: authStore.currentUser?.username || "",
+  email: authStore.currentUser?.email || "",
+  avatarUrl: authStore.currentUser?.avatarUrl || "",
+}));
 
-function handleRandomAvatar() {
+function handleRandomAvatar(setFieldValue: (field: string, value: unknown) => void) {
   const seed = Math.random().toString(36).substring(7);
   // Use Dicebear Avataaars
   const newAvatarUrl = `https://api.dicebear.com/9.x/avataaars/svg?seed=${seed}`;
-  profileForm.setFieldValue('avatarUrl', newAvatarUrl);
+  setFieldValue('avatarUrl', newAvatarUrl);
 }
 
 function handleUploadAvatar() {
   fileInputRef.value?.click();
 }
 
-function onFileChange(event: Event) {
+function onFileChange(event: Event, setFieldValue: (field: string, value: unknown) => void) {
   const target = event.target as HTMLInputElement;
   const file = target.files?.[0];
   if (file) {
     const reader = new FileReader();
     reader.onload = (e) => {
       if (typeof e.target?.result === "string") {
-        profileForm.setFieldValue('avatarUrl', e.target.result);
+        setFieldValue('avatarUrl', e.target.result);
       }
     };
     reader.readAsDataURL(file);
   }
 }
 
-const onProfileSubmit = profileForm.handleSubmit(async (values) => {
+async function onProfileSubmit(formValues: unknown) {
+  const values = formValues as { username: string; email: string; avatarUrl?: string };
   if (!authStore.currentUser) return;
 
   try {
@@ -108,9 +98,13 @@ const onProfileSubmit = profileForm.handleSubmit(async (values) => {
   } finally {
     accountSaving.value = false;
   }
-});
+}
 
-const onPasswordSubmit = passwordForm.handleSubmit(async (values) => {
+async function onPasswordSubmit(
+  formValues: unknown,
+  { resetForm }: { resetForm: () => void }
+) {
+  const values = formValues as { oldPassword: string; newPassword: string };
   if (!authStore.currentUser) return;
 
   try {
@@ -123,13 +117,13 @@ const onPasswordSubmit = passwordForm.handleSubmit(async (values) => {
 
     await authStore.changePassword(input);
     toast.success(t("settings.profile.messages.saved"));
-    passwordForm.resetForm();
+    resetForm();
   } catch (e) {
     toast.error(e instanceof Error ? e.message : t("settings.profile.messages.saveError"));
   } finally {
     accountSaving.value = false;
   }
-});
+}
 
 function getInitials(username: string): string {
   return username?.slice(0, 2).toUpperCase() || "U";
@@ -144,22 +138,24 @@ function getInitials(username: string): string {
       </CardHeader>
       <CardContent>
         <!-- Profile Form -->
-        <form @submit="onProfileSubmit">
+        <Form v-slot="{ values, setFieldValue }" :validation-schema="profileFormSchema"
+          :initial-values="profileInitialValues" :key="authStore.currentUser?.id" @submit="onProfileSubmit">
           <div class="flex gap-12 items-start mb-6">
             <!-- Left Column: Avatar & Actions -->
             <div class="flex flex-col items-center gap-5 min-w-[160px] pt-2">
               <FormField v-slot="{ value }" name="avatarUrl">
                 <div class="relative inline-block">
                   <Avatar class="size-28">
-                    <AvatarImage :src="value || ''" :alt="profileForm.values.username" />
-                    <AvatarFallback>{{ getInitials(profileForm.values.username || '') }}</AvatarFallback>
+                    <AvatarImage :src="value || ''" :alt="values.username" />
+                    <AvatarFallback>{{ getInitials(values.username || '') }}</AvatarFallback>
                   </Avatar>
 
                   <TooltipProvider>
                     <Tooltip>
                       <TooltipTrigger as-child>
                         <Button variant="outline" size="icon" type="button"
-                          class="absolute bottom-0 right-0 size-8 rounded-full shadow-md" @click="handleRandomAvatar">
+                          class="absolute bottom-0 right-0 size-8 rounded-full shadow-md"
+                          @click="handleRandomAvatar(setFieldValue)">
                           <RefreshCw class="size-4" />
                         </Button>
                       </TooltipTrigger>
@@ -173,10 +169,11 @@ function getInitials(username: string): string {
 
               <Button variant="outline" type="button" @click="handleUploadAvatar" :disabled="accountSaving">
                 <Upload class="size-4 mr-2" />
-                {{ t("settings.profile.fields.uploadAvatar") || "Upload Photo" }}
+                {{ t("settings.profile.fields.uploadAvatar") }}
               </Button>
 
-              <input type="file" ref="fileInputRef" class="hidden" accept="image/*" @change="onFileChange" />
+              <input type="file" ref="fileInputRef" class="hidden" accept="image/*"
+                @change="(e) => onFileChange(e, setFieldValue)" />
             </div>
 
             <!-- Right Column: Form Fields -->
@@ -203,19 +200,19 @@ function getInitials(username: string): string {
 
               <div class="flex justify-end pt-2">
                 <Button type="submit" :disabled="accountSaving">
-                  <span v-if="accountSaving">Saving...</span>
+                  <span v-if="accountSaving">{{ t("common.saving") }}</span>
                   <span v-else>{{ t("common.save") }}</span>
                 </Button>
               </div>
             </div>
           </div>
-        </form>
+        </Form>
 
         <Separator class="my-6" />
 
         <!-- Password Form -->
         <h3 class="text-lg font-semibold mb-4">{{ t("settings.profile.password.title") }}</h3>
-        <form @submit="onPasswordSubmit">
+        <Form :validation-schema="passwordFormSchema" @submit="onPasswordSubmit">
           <div class="max-w-md space-y-4">
             <FormField v-slot="{ componentField }" name="oldPassword">
               <FormItem>
@@ -253,7 +250,7 @@ function getInitials(username: string): string {
               </Button>
             </div>
           </div>
-        </form>
+        </Form>
       </CardContent>
     </Card>
   </div>

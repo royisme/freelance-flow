@@ -7,6 +7,7 @@ export default {
     delete: "Delete",
     save: "Save",
     saved: "Saved",
+    saving: "Saving...",
     cancel: "Cancel",
     confirm: "Confirm",
     confirmDelete: "Are you sure you want to delete this item?",
@@ -652,7 +653,7 @@ export default {
         avatarUrl: "Avatar URL",
         email: "Email",
         randomizeAvatar: "Randomize",
-        uploadAvatar: "Upload",
+        uploadAvatar: "Upload Photo",
       },
       validation: {
         invalidEmail: "Invalid email format",
@@ -697,6 +698,10 @@ export default {
         taxEnabledHint: "Enable tax calculation on invoices",
         expectedIncome: "Expected Annual Income",
         expectedIncomePlaceholder: "Select expected income range",
+        alertTitles: {
+          notRegistered: "Note",
+          registered: "Registered",
+        },
         incomeOptions: {
           under30k: "Under $30,000 (Small Supplier)",
           over30k: "Over $30,000",
@@ -718,6 +723,10 @@ export default {
       resendDomainTip:
         "Note: You must verify your domain in the Resend dashboard. Only emails from verified domains (e.g., billing{'@'}yourdomain.com) are allowed. For testing, you can use onboarding{'@'}resend.dev (sends to yourself only).",
       smtpCardTitle: "SMTP Configuration",
+      placeholders: {
+        provider: "Select a provider",
+        from: "Name <email@example.com>",
+      },
       fields: {
         provider: "Provider",
         from: "From Email",

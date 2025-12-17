@@ -7,6 +7,7 @@ export default {
     delete: "删除",
     save: "保存",
     saved: "已保存",
+    saving: "保存中...",
     cancel: "取消",
     confirm: "确认",
     confirmDelete: "确定要删除此项吗？",
@@ -695,6 +696,10 @@ export default {
         taxEnabledHint: "在发票上启用税款计算",
         expectedIncome: "预计年收入",
         expectedIncomePlaceholder: "选择预计收入范围",
+        alertTitles: {
+          notRegistered: "提示",
+          registered: "已注册",
+        },
         incomeOptions: {
           under30k: "低于 $30,000（小型供应商）",
           over30k: "超过 $30,000",
@@ -716,6 +721,10 @@ export default {
       resendDomainTip:
         "注意：使用 Resend 时，您必须在 Resend 仪表盘中验证您的域名。只能使用已验证域名的邮箱作为发件人（如 billing{'@'}yourdomain.com）。如果用于测试，可使用 onboarding{'@'}resend.dev（仅能发送给自己）。",
       smtpCardTitle: "SMTP 配置",
+      placeholders: {
+        provider: "选择提供商",
+        from: "姓名 <email@example.com>",
+      },
       fields: {
         provider: "提供商",
         from: "发件人邮箱",

@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref } from "vue";
-import { useForm } from 'vee-validate'
+import { onMounted, ref, computed } from "vue";
 import { toTypedSchema } from '@vee-validate/zod'
 import { useI18n } from "vue-i18n";
 import { useInvoiceEmailSettingsStore } from "@/stores/invoiceEmailSettings";
@@ -14,6 +13,7 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 import {
+  Form,
   FormControl,
   FormField,
   FormItem,
@@ -42,26 +42,24 @@ const saving = ref(false);
 
 const formSchema = toTypedSchema(invoiceEmailSettingsSchema);
 
-const form = useForm({
-  validationSchema: formSchema,
-  initialValues: {
+const initialValues = computed(() => {
+  if (store.settings) {
+    return {
+      ...store.settings,
+      smtpUseTls: store.settings.smtpUseTls || false,
+    };
+  }
+  return {
     provider: "mailto",
     subjectTemplate: t("settings.email.defaults.subjectTemplate"),
     bodyTemplate: t("settings.email.defaults.bodyTemplate"),
     signature: "",
     smtpUseTls: false,
-  },
+  };
 });
 
 onMounted(async () => {
   await store.fetchSettings();
-  if (store.settings) {
-    form.setValues({
-      ...store.settings,
-      // Ensure explicit values for optional booleans/numbers to avoid uncontrolled inputs if undefined
-      smtpUseTls: store.settings.smtpUseTls || false,
-    } as any);
-  }
 });
 
 const providerOptions = [
@@ -70,7 +68,8 @@ const providerOptions = [
   { label: t("settings.email.options.provider.smtp"), value: "smtp" },
 ];
 
-const onSubmit = form.handleSubmit(async (values) => {
+async function onSubmit(formValues: unknown) {
+  const values = formValues as any;
   try {
     saving.value = true;
     await store.saveSettings(values);
@@ -80,7 +79,7 @@ const onSubmit = form.handleSubmit(async (values) => {
   } finally {
     saving.value = false;
   }
-});
+}
 </script>
 
 <template>
@@ -90,7 +89,8 @@ const onSubmit = form.handleSubmit(async (values) => {
         <CardTitle>{{ t('settings.email.providerCardTitle') }}</CardTitle>
       </CardHeader>
       <CardContent>
-        <form @submit="onSubmit" class="space-y-6">
+        <Form :validation-schema="formSchema" :initial-values="initialValues" @submit="onSubmit" class="space-y-6"
+          :key="store.settings ? 'loaded' : 'loading'" v-slot="{ values, setFieldValue }">
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <!-- Provider -->
             <FormField v-slot="{ componentField }" name="provider">
@@ -99,7 +99,7 @@ const onSubmit = form.handleSubmit(async (values) => {
                 <Select v-bind="componentField">
                   <FormControl>
                     <SelectTrigger :disabled="saving">
-                      <SelectValue placeholder="Select a provider" />
+                      <SelectValue :placeholder="t('settings.email.placeholders.provider')" />
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
@@ -115,7 +115,7 @@ const onSubmit = form.handleSubmit(async (values) => {
             </FormField>
 
             <!-- Resend Specific -->
-            <template v-if="form.values.provider === 'resend'">
+            <template v-if="values.provider === 'resend'">
               <FormField v-slot="{ componentField }" name="resendApiKey">
                 <FormItem>
                   <FormLabel>{{ t('settings.email.fields.resendApiKey') }}</FormLabel>
@@ -128,7 +128,7 @@ const onSubmit = form.handleSubmit(async (values) => {
             </template>
 
             <!-- Resend Tip -->
-            <div v-if="form.values.provider === 'resend'" class="col-span-1 md:col-span-2">
+            <div v-if="values.provider === 'resend'" class="col-span-1 md:col-span-2">
               <Alert>
                 <Info class="h-4 w-4" />
                 <AlertTitle>{{ t('settings.email.resendCardTitle') }}</AlertTitle>
@@ -139,7 +139,7 @@ const onSubmit = form.handleSubmit(async (values) => {
             </div>
 
             <!-- SMTP Settings -->
-            <template v-if="form.values.provider === 'smtp'">
+            <template v-if="values.provider === 'smtp'">
               <FormField v-slot="{ componentField }" name="smtpHost">
                 <FormItem>
                   <FormLabel>{{ t('settings.email.fields.smtpHost') }}</FormLabel>
@@ -155,7 +155,7 @@ const onSubmit = form.handleSubmit(async (values) => {
                   <FormLabel>{{ t('settings.email.fields.smtpPort') }}</FormLabel>
                   <FormControl>
                     <Input type="number" v-bind="componentField" :disabled="saving"
-                      @input="(e: Event) => form.setFieldValue('smtpPort', parseInt((e.target as HTMLInputElement).value))" />
+                      @input="(e: Event) => setFieldValue('smtpPort', parseInt((e.target as HTMLInputElement).value))" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -201,7 +201,7 @@ const onSubmit = form.handleSubmit(async (values) => {
               <FormItem>
                 <FormLabel>{{ t('settings.email.fields.from') }}</FormLabel>
                 <FormControl>
-                  <Input v-bind="componentField" :disabled="saving" placeholder="Name <email@example.com>" />
+                  <Input v-bind="componentField" :disabled="saving" :placeholder="t('settings.email.placeholders.from')" />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -250,11 +250,11 @@ const onSubmit = form.handleSubmit(async (values) => {
 
           <div class="flex justify-end">
             <Button type="submit" :disabled="saving">
-              <span v-if="saving">Saving...</span>
+              <span v-if="saving">{{ t("common.saving") }}</span>
               <span v-else>{{ t("common.save") }}</span>
             </Button>
           </div>
-        </form>
+        </Form>
       </CardContent>
     </Card>
   </div>

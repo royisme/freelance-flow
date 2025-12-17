@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { onMounted, ref, computed } from "vue";
-import { useForm } from "vee-validate";
 import { toTypedSchema } from "@vee-validate/zod";
 import { useI18n } from "vue-i18n";
 import { toast } from "vue-sonner";
@@ -19,6 +18,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import {
+  Form,
   FormControl,
   FormField,
   FormItem,
@@ -47,22 +47,11 @@ const { t } = useI18n();
 const saving = ref(false);
 
 const formSchema = toTypedSchema(invoiceSettingsSchema);
-const form = useForm({
-  validationSchema: formSchema,
-  keepValuesOnUnmount: true,
-});
 
-const expectedIncomeOptions = computed(() => [
-  { label: t("settings.invoice.hst.incomeOptions.under30k"), value: "under30k" },
-  { label: t("settings.invoice.hst.incomeOptions.over30k"), value: "over30k" },
-  { label: t("settings.invoice.hst.incomeOptions.unsure"), value: "unsure" },
-]);
-
-onMounted(async () => {
-  await settingsStore.fetchSettings();
+const initialValues = computed(() => {
   if (settingsStore.settings) {
     const s = settingsStore.settings;
-    form.setValues({
+    return {
       invoiceTerms: s.invoiceTerms,
       defaultMessageTemplate: s.defaultMessageTemplate,
       senderName: s.senderName,
@@ -75,18 +64,28 @@ onMounted(async () => {
       hstNumber: s.hstNumber,
       taxEnabled: s.taxEnabled,
       expectedIncome: s.expectedIncome,
-    });
-  } else {
-    form.setValues({
-      invoiceTerms: t("settings.invoice.defaults.invoiceTerms"),
-      defaultMessageTemplate: t("settings.invoice.defaults.defaultMessageTemplate"),
-      hstRegistered: false,
-      taxEnabled: false,
-    });
+    };
   }
+  return {
+    invoiceTerms: t("settings.invoice.defaults.invoiceTerms"),
+    defaultMessageTemplate: t("settings.invoice.defaults.defaultMessageTemplate"),
+    hstRegistered: false,
+    taxEnabled: false,
+  };
 });
 
-const onSubmit = form.handleSubmit(async (values) => {
+const expectedIncomeOptions = computed(() => [
+  { label: t("settings.invoice.hst.incomeOptions.under30k"), value: "under30k" },
+  { label: t("settings.invoice.hst.incomeOptions.over30k"), value: "over30k" },
+  { label: t("settings.invoice.hst.incomeOptions.unsure"), value: "unsure" },
+]);
+
+onMounted(async () => {
+  await settingsStore.fetchSettings();
+});
+
+async function onSubmit(formValues: unknown) {
+  const values = formValues as any;
   saving.value = true;
   try {
     const currentSettings = settingsStore.settings;
@@ -105,12 +104,13 @@ const onSubmit = form.handleSubmit(async (values) => {
   } finally {
     saving.value = false;
   }
-});
+}
 </script>
 
 <template>
   <div class="invoice-settings w-full">
-    <form @submit="onSubmit" class="space-y-6">
+    <Form :validation-schema="formSchema" :initial-values="initialValues" @submit="onSubmit" class="space-y-6"
+      :key="settingsStore.settings ? 'loaded' : 'loading'" v-slot="{ values }">
       <Tabs default-value="defaults" class="w-full">
         <TabsList class="grid w-full grid-cols-3">
           <TabsTrigger value="defaults">{{ t('settings.invoice.defaultsCardTitle') }}</TabsTrigger>
@@ -222,10 +222,10 @@ const onSubmit = form.handleSubmit(async (values) => {
               <CardTitle>{{ t('settings.invoice.hst.cardTitle') }}</CardTitle>
             </CardHeader>
             <CardContent class="space-y-6">
-              <Alert v-if="!form.values.hstRegistered" variant="default"
+              <Alert v-if="!values.hstRegistered" variant="default"
                 class="bg-blue-50 dark:bg-blue-950 border-blue-200 dark:border-blue-900 text-blue-800 dark:text-blue-300">
                 <Info class="h-4 w-4" />
-                <AlertTitle class="ml-2">Note</AlertTitle>
+                <AlertTitle class="ml-2">{{ t("settings.invoice.hst.alertTitles.notRegistered") }}</AlertTitle>
                 <AlertDescription class="ml-2">
                   {{ t('settings.invoice.hst.info.notRegistered') }}
                 </AlertDescription>
@@ -233,7 +233,7 @@ const onSubmit = form.handleSubmit(async (values) => {
               <Alert v-else variant="default"
                 class="bg-amber-50 dark:bg-amber-950 border-amber-200 dark:border-amber-900 text-amber-800 dark:text-amber-300">
                 <AlertCircle class="h-4 w-4" />
-                <AlertTitle class="ml-2">Registered</AlertTitle>
+                <AlertTitle class="ml-2">{{ t("settings.invoice.hst.alertTitles.registered") }}</AlertTitle>
                 <AlertDescription class="ml-2">
                   {{ t('settings.invoice.hst.info.registered') }}
                 </AlertDescription>
@@ -253,7 +253,7 @@ const onSubmit = form.handleSubmit(async (values) => {
                 </FormItem>
               </FormField>
 
-              <div v-if="form.values.hstRegistered" class="space-y-4 border-l-2 pl-4 ml-2">
+              <div v-if="values.hstRegistered" class="space-y-4 border-l-2 pl-4 ml-2">
                 <FormField v-slot="{ componentField }" name="hstNumber">
                   <FormItem>
                     <FormLabel>{{ t('settings.invoice.hst.number') }}</FormLabel>
@@ -294,7 +294,7 @@ const onSubmit = form.handleSubmit(async (values) => {
                     </div>
                     <FormControl>
                       <Switch :checked="value" @update:checked="handleChange"
-                        :disabled="saving || !form.values.hstRegistered" />
+                        :disabled="saving || !values.hstRegistered" />
                     </FormControl>
                   </FormItem>
                 </FormField>
@@ -307,11 +307,11 @@ const onSubmit = form.handleSubmit(async (values) => {
 
       <div class="flex justify-end pt-4">
         <Button type="submit" :disabled="saving">
-          <span v-if="saving">Saving...</span>
+          <span v-if="saving">{{ t("common.saving") }}</span>
           <span v-else>{{ t("common.save") }}</span>
         </Button>
       </div>
-    </form>
+    </Form>
   </div>
 </template>
 

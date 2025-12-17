@@ -1,7 +1,5 @@
-```vue
 <script setup lang="ts">
 import { onMounted, ref, computed } from "vue";
-import { useForm } from "vee-validate";
 import { toTypedSchema } from "@vee-validate/zod";
 import { useI18n } from "vue-i18n";
 
@@ -19,6 +17,7 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 import {
+  Form,
   FormControl,
   FormField,
   FormItem,
@@ -45,16 +44,26 @@ const saving = ref(false);
 
 const formSchema = toTypedSchema(generalSettingsSchema);
 
-const form = useForm({
-  validationSchema: formSchema,
-  initialValues: {
+// Initial values computed from store
+const initialValues = computed(() => {
+  if (settingsStore.settings) {
+    return {
+      currency: settingsStore.settings.currency,
+      defaultTaxRate: settingsStore.settings.defaultTaxRate,
+      language: settingsStore.settings.language,
+      theme: settingsStore.settings.theme,
+      dateFormat: settingsStore.settings.dateFormat,
+      timezone: settingsStore.settings.timezone,
+    };
+  }
+  return {
     currency: "USD",
     defaultTaxRate: 0,
     language: "en-US",
     theme: "light",
     dateFormat: "2006-01-02",
     timezone: "UTC",
-  }
+  };
 });
 
 const currencyOptions = computed(() => [
@@ -123,20 +132,10 @@ async function setModuleEnabled(moduleID: ModuleID, enabled: boolean) {
 
 onMounted(async () => {
   await settingsStore.fetchSettings();
-  if (settingsStore.settings) {
-    const settings = settingsStore.settings;
-    form.setValues({
-      currency: settings.currency,
-      defaultTaxRate: settings.defaultTaxRate,
-      language: settings.language,
-      theme: settings.theme,
-      dateFormat: settings.dateFormat,
-      timezone: settings.timezone,
-    });
-  }
 });
 
-const onSubmit = form.handleSubmit(async (values) => {
+async function onSubmit(formValues: unknown) {
+  const values = formValues as any; // Using any here to match simpler refactor for now, can be stricter later
   saving.value = true;
   try {
     const currentSettings = settingsStore.settings;
@@ -155,19 +154,19 @@ const onSubmit = form.handleSubmit(async (values) => {
   } finally {
     saving.value = false;
   }
-});
+}
 
-function handleThemeChange(value: any) {
+function handleThemeChange(value: any, setFieldValue: (field: string, value: any) => void) {
   const theme = String(value);
-  form.setFieldValue('theme', theme);
+  setFieldValue('theme', theme);
   if (appStore.theme !== theme) {
     appStore.setTheme(theme as 'light' | 'dark');
   }
 }
 
-function handleLanguageChange(value: any) {
+function handleLanguageChange(value: any, setFieldValue: (field: string, value: any) => void) {
   const lang = String(value);
-  form.setFieldValue('language', lang);
+  setFieldValue('language', lang);
   appStore.setLocale(lang as 'en-US' | 'zh-CN');
 }
 </script>
@@ -179,7 +178,8 @@ function handleLanguageChange(value: any) {
         <CardTitle>{{ t('settings.general.cardTitle') }}</CardTitle>
       </CardHeader>
       <CardContent>
-        <form @submit="onSubmit" class="space-y-6">
+        <Form :validation-schema="formSchema" :initial-values="initialValues" @submit="onSubmit" class="space-y-6"
+          v-slot="{ setFieldValue }">
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <!-- Currency -->
             <FormField v-slot="{ componentField }" name="currency">
@@ -207,7 +207,7 @@ function handleLanguageChange(value: any) {
                 <FormLabel>{{ t('settings.general.fields.defaultTaxRate') }}</FormLabel>
                 <FormControl>
                   <Input type="number" v-bind="componentField" :min="0" :max="1" :step="0.01" :disabled="saving"
-                    @input="(e: Event) => form.setFieldValue('defaultTaxRate', parseFloat((e.target as HTMLInputElement).value))" />
+                    @input="(e: Event) => setFieldValue('defaultTaxRate', parseFloat((e.target as HTMLInputElement).value))" />
                 </FormControl>
                 <FormDescription>
                   {{ t("settings.general.hints.taxRate") }}
@@ -260,7 +260,7 @@ function handleLanguageChange(value: any) {
             <FormField v-slot="{ componentField }" name="theme">
               <FormItem>
                 <FormLabel>{{ t('settings.general.fields.theme') }}</FormLabel>
-                <Select v-bind="componentField" @update:model-value="handleThemeChange">
+                <Select v-bind="componentField" @update:model-value="(val) => handleThemeChange(val, setFieldValue)">
                   <FormControl>
                     <SelectTrigger :disabled="saving">
                       <SelectValue />
@@ -280,7 +280,7 @@ function handleLanguageChange(value: any) {
             <FormField v-slot="{ componentField }" name="language">
               <FormItem>
                 <FormLabel>{{ t('settings.general.fields.language') }}</FormLabel>
-                <Select v-bind="componentField" @update:model-value="handleLanguageChange">
+                <Select v-bind="componentField" @update:model-value="(val) => handleLanguageChange(val, setFieldValue)">
                   <FormControl>
                     <SelectTrigger :disabled="saving">
                       <SelectValue />
@@ -300,11 +300,11 @@ function handleLanguageChange(value: any) {
 
           <div class="flex justify-end">
             <Button type="submit" :disabled="saving">
-              <span v-if="saving">Saving...</span>
+              <span v-if="saving">{{ t("common.saving") }}</span>
               <span v-else>{{ t("common.save") }}</span>
             </Button>
           </div>
-        </form>
+        </Form>
       </CardContent>
     </Card>
 
@@ -321,15 +321,10 @@ function handleLanguageChange(value: any) {
           <div v-for="m in toggleableModules" :key="m.id"
             class="flex items-center justify-between rounded-lg border p-4">
             <Label>{{ t(m.labelKey) }}</Label>
-            <Switch :checked="isModuleEnabled(m.id)" @update:checked="(v) => setModuleEnabled(m.id, v)" />
+            <Switch :checked="isModuleEnabled(m.id)" @update:checked="(v: boolean) => setModuleEnabled(m.id, v)" />
           </div>
         </div>
       </CardContent>
     </Card>
   </div>
 </template>
-
-<style scoped>
-/* No scoped styles needed */
-</style>
-```
