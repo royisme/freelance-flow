@@ -49,11 +49,12 @@ func main() {
 
 	// Create application with options
 	err := wails.Run(&options.App{
-		Title:     "Tally",
-		Width:     1200,
-		Height:    900,
-		MinWidth:  1024,
-		MinHeight: 800,
+		Title:             "Tally",
+		Width:             1200,
+		Height:            900,
+		MinWidth:          1024,
+		MinHeight:         800,
+		HideWindowOnClose: true, // 关闭窗口时隐藏而非退出，用户可通过 Cmd+Q 真正退出
 		AssetServer: &assetserver.Options{
 			Assets: assets,
 		},
