@@ -34,7 +34,8 @@ export const useDashboardStore = defineStore("dashboard", () => {
       pendingAmount.value = invoiceStore.stats.totalDue;
 
       // Mock Monthly Revenue (Paid Invoices) - In real app, filter by date
-      totalRevenueMonth.value = invoiceStore.invoices
+      const invoiceList = invoiceStore.invoices || [];
+      totalRevenueMonth.value = invoiceList
         .filter((i) => i.status === "paid")
         .reduce((sum, i) => sum + i.total, 0);
 

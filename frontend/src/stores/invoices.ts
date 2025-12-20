@@ -78,7 +78,8 @@ export const useInvoiceStore = defineStore("invoices", () => {
 
   // Grouped by Status (for Dashboard widgets)
   const stats = computed(() => {
-    const totalDue = invoices.value
+    const list = invoices.value || [];
+    const totalDue = list
       .filter((i) => i.status === "sent" || i.status === "overdue")
       .reduce((acc, curr) => acc + curr.total, 0);
 

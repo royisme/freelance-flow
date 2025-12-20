@@ -77,6 +77,18 @@ export const useAuthStore = defineStore("auth", () => {
       currentUser.value = user;
       localStorage.setItem("currentUserId", String(user.id));
       usersList.value = await GetAllUsers(); // Refresh list including new user
+
+      // Load settings in a separate try-catch to not affect auth flow
+      try {
+        await appStore.loadUserSettings(user.id);
+      } catch (settingsError) {
+        console.error(
+          "Failed to load settings after registration:",
+          settingsError
+        );
+        // Don't throw - settings will use defaults
+      }
+
       return user;
     } catch (e) {
       error.value = e instanceof Error ? e.message : "Registration failed";

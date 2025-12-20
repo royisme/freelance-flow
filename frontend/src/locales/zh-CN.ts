@@ -107,6 +107,7 @@ export default {
     avatarFallbackAlt: "头像占位图",
     login: "登录",
     invalidPassword: "密码错误",
+    or: "或",
     createAccount: "创建账户",
     setupProfile: "设置您的个人资料开始使用",
     username: "用户名",
@@ -121,6 +122,8 @@ export default {
     regenerateAvatar: "重新生成头像",
     createProfile: "创建账户",
     registerFailed: "注册失败",
+    registerSuccess: "账户创建成功！",
+    validationError: "请检查表单后重试",
     logout: "退出登录",
     switchUser: "切换用户",
     // 财务偏好

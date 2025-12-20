@@ -35,6 +35,7 @@ import { useAuthStore } from '@/stores/auth'
 import { useAppStore } from '@/stores/app'
 import { useI18n } from 'vue-i18n'
 import { registerProfileSchema, registerPasswordBaseSchema, registerPreferencesSchema } from '@/schemas/auth'
+import { toast } from 'vue-sonner'
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -61,7 +62,7 @@ const formSchema = toTypedSchema(
 )
 
 // Form setup
-const { handleSubmit, values, setFieldValue, validateField } = useForm({
+const { handleSubmit, values, setFieldValue, validateField, setFieldError } = useForm({
   validationSchema: formSchema,
   initialValues: {
     username: '',
@@ -122,7 +123,14 @@ async function nextStep() {
   } else if (currentStep.value === 2) {
     const r1 = await validateField('password')
     const r2 = await validateField('confirmPassword')
-    if (r1.valid && r2.valid) validGroup = true
+    // Manual password match check (refine rules don't run on field-level validation)
+    if (r1.valid && r2.valid) {
+      if (values.password === values.confirmPassword) {
+        validGroup = true
+      } else {
+        setFieldError('confirmPassword', t('auth.passwordsNotMatch'))
+      }
+    }
   }
 
   if (validGroup) currentStep.value++
@@ -138,6 +146,18 @@ const handleRegister = handleSubmit(async (formValues) => {
   isRegistering.value = true
   registerError.value = null
 
+  // Debug: Log all form data
+  console.log('=== Registration Form Data ===')
+  console.log('Username:', formValues.username)
+  console.log('Email:', formValues.email)
+  console.log('Password:', formValues.password ? '***' : '(empty)')
+  console.log('Avatar URL:', avatarUrl.value)
+  console.log('Language:', formValues.language)
+  console.log('Currency:', formValues.currency)
+  console.log('Timezone:', formValues.timezone)
+  console.log('Avatar Seed:', formValues.avatarSeed)
+  console.log('==============================')
+
   try {
     const settings = {
       language: formValues.language,
@@ -146,20 +166,53 @@ const handleRegister = handleSubmit(async (formValues) => {
       theme: appStore.theme,
     }
 
-    await authStore.register({
+    const registerPayload = {
       username: formValues.username,
       password: formValues.password,
       email: formValues.email || "",
       avatarUrl: avatarUrl.value,
       settingsJson: JSON.stringify(settings),
-    })
+    }
+    
+    console.log('Register Payload:', { ...registerPayload, password: '***' })
+    console.log('Settings JSON:', settings)
 
+    const user = await authStore.register(registerPayload)
+    
+    console.log('Registration successful! User:', user)
+    console.log('Is authenticated:', authStore.isAuthenticated)
+
+    toast.success(t('auth.registerSuccess') || 'Registration successful!')
     router.push('/dashboard')
   } catch (e) {
-    registerError.value = e instanceof Error ? e.message : t('auth.registerFailed')
+    console.error('=== Registration Error ===')
+    console.error('Error object:', e)
+    console.error('Error message:', e instanceof Error ? e.message : String(e))
+    console.error('==========================')
+    
+    const errorMessage = e instanceof Error ? e.message : t('auth.registerFailed')
+    registerError.value = errorMessage
+    toast.error(errorMessage)
+    // NOTE: Do NOT jump to step 1, stay on current step and let user see the error
   } finally {
     isRegistering.value = false
   }
+}, (submitErrors) => {
+  // Validation errors - just log them, don't jump steps
+  console.error('=== Validation Errors ===')
+  console.error('Errors:', submitErrors.errors)
+  console.error('Values:', submitErrors.values)
+  console.error('=========================')
+  
+  const errors = submitErrors.errors
+  const errorMessages = Object.values(errors || {}).filter(Boolean)
+  
+  if (errorMessages.length > 0) {
+    toast.error(errorMessages[0] as string)
+  } else {
+    toast.error(t('auth.validationError') || 'Please check the form and try again')
+  }
+  // NOTE: Do NOT jump to any step, stay on current step
 })
 </script>
 
@@ -194,9 +247,7 @@ const handleRegister = handleSubmit(async (formValues) => {
       <div class="min-h-[240px]">
 
         <!-- Step 1: Profile -->
-        <template v-if="currentStep === 1">
-          <!-- Using v-if instead of Transition for layout stability with Shadcn components initially -->
-          <div class="text-center animate-in slide-in-from-right-4 fade-in duration-300">
+        <div v-show="currentStep === 1" class="text-center">
             <div class="relative inline-block mb-6 pt-2">
               <Avatar class="w-24 h-24 border-4 border-card shadow-lg">
                 <AvatarImage :src="avatarUrl" />
@@ -246,12 +297,10 @@ const handleRegister = handleSubmit(async (formValues) => {
                 </FormItem>
               </FormField>
             </form>
-          </div>
-        </template>
+        </div>
 
         <!-- Step 2: Password -->
-        <template v-else-if="currentStep === 2">
-          <div class="text-center animate-in slide-in-from-right-4 fade-in duration-300">
+        <div v-show="currentStep === 2" class="text-center">
             <h2 class="text-xl font-semibold mb-6 tracking-tight">{{ t('auth.setPassword') }}</h2>
 
             <form @submit.prevent="nextStep" class="text-left space-y-4 max-w-sm mx-auto">
@@ -283,15 +332,13 @@ const handleRegister = handleSubmit(async (formValues) => {
                 </FormItem>
               </FormField>
             </form>
-          </div>
-        </template>
+        </div>
 
         <!-- Step 3: Preferences -->
-        <template v-else-if="currentStep === 3">
-          <div class="text-center animate-in slide-in-from-right-4 fade-in duration-300">
+        <div v-show="currentStep === 3" class="text-center">
             <h2 class="text-xl font-semibold mb-6 tracking-tight">{{ t('auth.financialPreferences') }}</h2>
 
-            <form @submit.prevent="handleRegister" class="text-left space-y-4 max-w-sm mx-auto">
+            <form @submit.prevent="handleRegister" class="space-y-4">
               <FormField v-slot="{ componentField }" name="language">
                 <FormItem>
                   <FormLabel>{{ t('auth.language') }}</FormLabel>
@@ -353,8 +400,7 @@ const handleRegister = handleSubmit(async (formValues) => {
             <p v-if="registerError" class="text-destructive text-sm mt-2 font-medium">
               {{ registerError }}
             </p>
-          </div>
-        </template>
+        </div>
 
       </div>
 

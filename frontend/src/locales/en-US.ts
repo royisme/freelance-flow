@@ -107,6 +107,7 @@ export default {
     avatarFallbackAlt: "Avatar fallback",
     login: "Login",
     invalidPassword: "Invalid password",
+    or: "or",
     createAccount: "Create Account",
     setupProfile: "Set up your profile to get started",
     username: "Username",
@@ -121,6 +122,8 @@ export default {
     regenerateAvatar: "Generate new avatar",
     createProfile: "Create Profile",
     registerFailed: "Registration failed",
+    registerSuccess: "Account created successfully!",
+    validationError: "Please check the form and try again",
     logout: "Logout",
     switchUser: "Switch User",
     // Financial preferences
