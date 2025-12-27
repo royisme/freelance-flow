@@ -29,9 +29,31 @@ export const useBootstrapStore = defineStore("bootstrap", () => {
   }
 
   function init() {
-    EventsOn("bootstrap:backend-timings", (t: BackendBootTimings) => {
-      backendTimings.value = t;
-    });
+    try {
+      EventsOn("bootstrap:backend-timings", (t: BackendBootTimings) => {
+        backendTimings.value = t;
+      });
+    } catch (e) {
+      console.warn("Wails runtime not available or EventsOn failed:", e);
+    }
+
+    // Auto-mock for dev environment if not set within a short time (e.g. pure Vite dev)
+    if (import.meta.env.DEV) {
+      setTimeout(() => {
+        if (!backendTimings.value) {
+          console.info("Mocking backend timings for dev environment (no Wails backend detected)");
+          backendTimings.value = {
+            processStart: new Date().toISOString(),
+            dbInitMs: 10,
+            servicesInitMs: 20,
+            totalBeforeUiMs: 30,
+          };
+        }
+        if (frontendMarks.value.updateInitMs === undefined) {
+          frontendMarks.value.updateInitMs = 40;
+        }
+      }, 500);
+    }
   }
 
   return {

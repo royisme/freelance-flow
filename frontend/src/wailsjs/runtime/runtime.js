@@ -8,6 +8,30 @@ The electron alternative for Go
 (c) Lea Anthony 2019-present
 */
 
+// Mock runtime for browser environment
+if (typeof window !== 'undefined') {
+    if (!window.runtime) {
+        window.runtime = new Proxy({}, {
+            get: function(target, prop, receiver) {
+                return function() {};
+            }
+        });
+    }
+    if (!window.go) {
+        window.go = {
+            services: new Proxy({}, {
+                get: function(target, prop, receiver) {
+                    return new Proxy({}, {
+                         get: function(target, prop, receiver) {
+                             return () => Promise.resolve({});
+                         }
+                    });
+                }
+            })
+        };
+    }
+}
+
 export function LogPrint(message) {
     window.runtime.LogPrint(message);
 }

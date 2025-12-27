@@ -30,18 +30,35 @@ export async function registerUserAndGoDashboard(
 
   await page.goto(`${baseURL}/#/register`);
 
+  // Step 1: Profile
   await page.getByPlaceholder(/username|用户名/i).fill(username);
+  // Click Next
+  await page.getByRole("button", { name: /next|下一步/i }).click();
+
+  // Step 2: Password
   await page.getByPlaceholder(/password(?!.*confirm)|密码/i).first().fill(password);
-  await page.getByPlaceholder(/confirm|确认/i).fill(password);
+  await page.getByPlaceholder(/Re-enter|confirm|确认/i).fill(password);
+  // Click Next
+  await page.getByRole("button", { name: /next|下一步/i }).click();
 
-  const prefSelects = page.locator(".preferences-section .n-select");
-  // currency select is second in preferences section
-  await prefSelects.nth(1).click();
-  await page.getByText(new RegExp(currency, "i")).click();
-  // timezone select is third
-  await prefSelects.nth(2).click();
-  await page.getByText(timezone).click();
+  // Step 3: Preferences
+  // Currency is the second select (first is Language)
+  // We need to match the select triggers. The form uses Select from shadcn-vue.
+  // The structure is likely button role="combobox" inside the form items.
 
+  // Note: SelectTrigger usually has role="combobox".
+  // The first combobox is Language, second is Currency, third is Timezone.
+  const selects = page.getByRole('combobox');
+
+  // Select Currency (2nd combobox, index 1)
+  await selects.nth(1).click();
+  await page.getByRole('option', { name: new RegExp(currency, "i") }).click();
+
+  // Select Timezone (3rd combobox, index 2)
+  await selects.nth(2).click();
+  await page.getByRole('option', { name: timezone }).click();
+
+  // Create Profile
   await page.getByRole("button", { name: /create|注册|profile/i }).click();
   await expect(page).toHaveURL(/#\/dashboard/);
 

@@ -14,7 +14,7 @@ import FinanceSettings from "@/views/settings/FinanceSettings.vue";
 
 export const financeModule: AppModule = {
   id: "finance",
-  enabledByDefault: false,
+  enabledByDefault: true,
   toggleable: true,
   nav: {
     labelKey: "nav.finance",

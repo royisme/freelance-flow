@@ -16,6 +16,8 @@ import * as WailsInvoiceEmailSettingsService from "@/wailsjs/go/services/Invoice
 import * as WailsUserPreferencesService from "@/wailsjs/go/services/UserPreferencesService";
 import * as WailsUserTaxSettingsService from "@/wailsjs/go/services/UserTaxSettingsService";
 import * as WailsUserInvoiceSettingsService from "@/wailsjs/go/services/UserInvoiceSettingsService";
+// Note: FinanceService binding will be available at runtime.
+// If typescript complains, we can declare it or cast window.go.
 import { useAuthStore } from "@/stores/auth";
 import { dto } from "@/wailsjs/go/models";
 import { dateOnlySortKey } from "@/utils/date";
@@ -28,6 +30,7 @@ import type {
   IInvoiceService,
   StatusBarOutput,
 } from "@/types";
+import type { FinanceAccount, FinanceSummary } from "@/types/finance";
 
 // Check if we're in Wails runtime (window.go exists)
 const isWailsRuntime = typeof window !== "undefined" && "go" in window;
@@ -189,6 +192,70 @@ const wailsStatusBarService = {
   },
 };
 
+// --- Finance Service Adapter ---
+const wailsFinanceService = {
+  summary: {
+    get: async (): Promise<FinanceSummary> => {
+       const wails = window as any;
+       return wails.go.services.FinanceService.GetSummary(getUserId());
+    }
+  },
+  accounts: {
+    list: async (): Promise<FinanceAccount[]> => {
+      const wails = window as any;
+      return wails.go.services.FinanceService.GetAccounts(getUserId());
+    },
+    create: async (input: any) => {
+      const wails = window as any;
+      return wails.go.services.FinanceService.CreateAccount(getUserId(), input);
+    },
+    update: async (input: any) => {
+      const wails = window as any;
+      return wails.go.services.FinanceService.UpdateAccount(getUserId(), input);
+    },
+    delete: async (id: number) => {
+      const wails = window as any;
+      return wails.go.services.FinanceService.DeleteAccount(getUserId(), id);
+    }
+  },
+  categories: {
+    list: async () => {
+      const wails = window as any;
+      return wails.go.services.FinanceService.GetCategories(getUserId());
+    },
+    create: async (input: any) => {
+      const wails = window as any;
+      return wails.go.services.FinanceService.CreateCategory(getUserId(), input);
+    },
+    update: async (input: any) => {
+      const wails = window as any;
+      return wails.go.services.FinanceService.UpdateCategory(getUserId(), input);
+    },
+    delete: async (id: number) => {
+      const wails = window as any;
+      return wails.go.services.FinanceService.DeleteCategory(getUserId(), id);
+    }
+  },
+  transactions: {
+    list: async (filter: any) => {
+      const wails = window as any;
+      return wails.go.services.FinanceService.GetTransactions(getUserId(), filter);
+    },
+    update: async (id: number, categoryId: number | null) => {
+      const wails = window as any;
+      return wails.go.services.FinanceService.UpdateTransaction(getUserId(), id, categoryId);
+    },
+    delete: async (id: number) => {
+      const wails = window as any;
+      return wails.go.services.FinanceService.DeleteTransaction(getUserId(), id);
+    },
+    import: async (input: any) => {
+      const wails = window as any;
+      return wails.go.services.FinanceService.ImportTransactions(getUserId(), input);
+    }
+  }
+};
+
 const mockEmailSettings: InvoiceEmailSettings = {
   provider: "mailto",
   subjectTemplate: "Invoice {{number}}",
@@ -210,27 +277,7 @@ export const api = isWailsRuntime
       reports: wailsReportService,
       invoiceEmailSettings: wailsInvoiceEmailSettingsService,
       statusBar: wailsStatusBarService,
-      finance: {
-        summary: {
-          get: async () => ({
-            totalBalance: 0,
-            totalIncome: 0,
-            totalExpense: 0,
-            cashFlow: 0,
-          }), // Placeholder until backend service exists
-        },
-        accounts: {
-          list: async () => [], // Placeholder
-        },
-        settings: {
-          get: async () => ({
-            autoCategorize: false,
-            autoReconcile: false,
-            userId: 0,
-          }), // Placeholder
-          update: async (input: any) => input, // Placeholder
-        },
-      },
+      finance: wailsFinanceService,
     }
   : {
       clients: mockClientService,
@@ -371,14 +418,21 @@ export const api = isWailsRuntime
         },
         accounts: {
           list: async () => [],
-        },
-        settings: {
-          get: async () => ({
-            autoCategorize: false,
-            autoReconcile: false,
-            userId: 0,
-          }),
+          create: async (input: any) => ({ ...input, id: 1 }),
           update: async (input: any) => input,
+          delete: async (id: number) => {},
+        },
+        categories: {
+          list: async () => [],
+          create: async (input: any) => input,
+          update: async (input: any) => input,
+          delete: async (id: number) => {},
+        },
+        transactions: {
+          list: async (filter: any) => [],
+          update: async (id: number, catId: number) => {},
+          delete: async (id: number) => {},
+          import: async (input: any) => 0,
         },
       },
     };
