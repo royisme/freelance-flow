@@ -1,4 +1,4 @@
-# FreelanceFlow
+# Tally
 
 A modern desktop application for freelance management, built with Go (Wails) and Vue 3.
 
