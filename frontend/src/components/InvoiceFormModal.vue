@@ -45,16 +45,9 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover'
 import { Calendar } from '@/components/ui/calendar'
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table'
-import { Checkbox } from '@/components/ui/checkbox'
+import { SelectableDataTable } from '@/components/ui/data-table'
 import { Separator } from '@/components/ui/separator'
+import type { ColumnDef } from '@tanstack/vue-table'
 
 interface Props {
   show?: boolean
@@ -129,6 +122,14 @@ const timeEntries = ref<TimeEntry[]>([])
 const timeEntriesLoading = ref(false)
 const selectedTimeEntryIds = ref<number[]>([])
 
+function setSelectionFromIds(ids: number[]) {
+  selectedTimeEntryIds.value = ids
+}
+
+function clearSelection() {
+  selectedTimeEntryIds.value = []
+}
+
 // Eligible time entries: billable entries that are either:
 // 1. Already linked to this invoice (for editing)
 // 2. Not linked to any invoice yet (available for selection)
@@ -151,11 +152,25 @@ const selectedHours = computed(() => {
   return totalSeconds / 3600
 })
 
-// Helper for checkbox state - ensures correct type comparison
-const selectedIdsSet = computed(() => new Set(selectedTimeEntryIds.value))
-function isSelected(entryId: number): boolean {
-  return selectedIdsSet.value.has(entryId)
-}
+// Time entries table columns
+const timeEntryColumns: ColumnDef<TimeEntry>[] = [
+  {
+    accessorKey: 'date',
+    header: () => t('invoices.selectEntries.columns.date'),
+    cell: ({ row }) => row.original.date,
+  },
+  {
+    accessorKey: 'description',
+    header: () => t('timesheet.form.description'),
+    cell: ({ row }) => row.original.description,
+  },
+  {
+    accessorKey: 'durationSeconds',
+    header: () => t('invoices.selectEntries.columns.hours'),
+    cell: ({ row }) => (row.original.durationSeconds / 3600).toFixed(2),
+    meta: { class: 'text-right' },
+  },
+]
 
 // Helper date getter/setter factory
 const createDateComputed = (fieldName: 'issueDate' | 'dueDate') => computed({
@@ -213,7 +228,7 @@ watch(
     projectOptions.value = []
     projectsData.value = []
     timeEntries.value = []
-    selectedTimeEntryIds.value = []
+    clearSelection()
 
     if (!clientId) return
 
@@ -240,7 +255,7 @@ watch(
     // Actually, "Reset" happens at the top here:
     if (!isInitializing.value) {
       timeEntries.value = []
-      selectedTimeEntryIds.value = []
+      clearSelection()
       selectedProjectRate.value = 0
     }
 
@@ -276,10 +291,10 @@ watch(
           .map(e => e.id)
 
         console.log('[InvoiceFormModal] Auto-selecting linked entries:', linkedIds)
-        selectedTimeEntryIds.value = linkedIds
+        setSelectionFromIds(linkedIds)
       } else {
         // New invoice: select all eligible entries by default
-        selectedTimeEntryIds.value = eligibleTimeEntries.value.map((e) => e.id)
+        setSelectionFromIds(eligibleTimeEntries.value.map((e) => e.id))
         console.log('[InvoiceFormModal] New invoice, selecting all:', selectedTimeEntryIds.value)
       }
     } catch {
@@ -438,7 +453,7 @@ watch(() => props.invoice, async (newInvoice) => {
     selectedProjectId.value = null
     projectOptions.value = []
     timeEntries.value = []
-    selectedTimeEntryIds.value = []
+    clearSelection()
   }
 }, { immediate: true })
 
@@ -511,28 +526,6 @@ const onSubmit = form.handleSubmit((values) => {
     timeEntryIds: selectedTimeEntryIds.value
   })
   handleUpdateShow(false)
-})
-
-function toggleSelection(id: number, checked: boolean | string) {
-  console.log('[InvoiceFormModal] toggleSelection called:', { id, checked })
-  if (checked === true) {
-    selectedTimeEntryIds.value = [...selectedTimeEntryIds.value, id]
-  } else {
-    selectedTimeEntryIds.value = selectedTimeEntryIds.value.filter(existingId => existingId !== id)
-  }
-  console.log('[InvoiceFormModal] selectedTimeEntryIds now:', selectedTimeEntryIds.value)
-}
-
-function toggleAll(checked: boolean | string) {
-  if (checked === true) {
-    selectedTimeEntryIds.value = eligibleTimeEntries.value.map(e => e.id)
-  } else {
-    selectedTimeEntryIds.value = []
-  }
-}
-
-const allSelected = computed(() => {
-  return eligibleTimeEntries.value.length > 0 && selectedTimeEntryIds.value.length === eligibleTimeEntries.value.length
 })
 </script>
 
@@ -674,44 +667,17 @@ const allSelected = computed(() => {
             </div>
           </div>
 
-          <div class="border rounded-md">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead class="w-[50px]">
-                    <Checkbox :model-value="allSelected" @update:checked="(value: boolean) => toggleAll(value)"
-                      :disabled="eligibleTimeEntries.length === 0" />
-                  </TableHead>
-                  <TableHead class="w-[160px]">{{ t('invoices.selectEntries.columns.date') }}</TableHead>
-                  <TableHead>{{ t('timesheet.form.description') }}</TableHead>
-                  <TableHead class="text-right w-[120px]">{{ t('invoices.selectEntries.columns.hours') }}</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                <TableRow v-if="!selectedProjectId">
-                  <TableCell colspan="4" class="text-center h-24 text-muted-foreground">
-                    {{ t('invoices.form.timeEntries.selectProjectHint') }}
-                  </TableCell>
-                </TableRow>
-                <TableRow v-else-if="!timeEntriesLoading && eligibleTimeEntries.length === 0">
-                  <TableCell colspan="4" class="text-center h-24 text-muted-foreground">
-                    {{ t('invoices.form.timeEntries.empty') }}
-                  </TableCell>
-                </TableRow>
-                <template v-else>
-                  <TableRow v-for="entry in eligibleTimeEntries" :key="entry.id">
-                    <TableCell>
-                      <Checkbox :model-value="isSelected(entry.id)"
-                        @update:checked="(value: boolean) => toggleSelection(entry.id, value)" />
-                    </TableCell>
-                    <TableCell>{{ entry.date }}</TableCell>
-                    <TableCell>{{ entry.description }}</TableCell>
-                    <TableCell class="text-right">{{ (entry.durationSeconds / 3600).toFixed(2) }}</TableCell>
-                  </TableRow>
-                </template>
-              </TableBody>
-            </Table>
+          <div v-if="!selectedProjectId" class="border rounded-md p-8 text-center text-muted-foreground">
+            {{ t('invoices.form.timeEntries.selectProjectHint') }}
           </div>
+          <SelectableDataTable
+            v-else
+            :columns="timeEntryColumns"
+            :data="eligibleTimeEntries"
+            :loading="timeEntriesLoading"
+            :selectable="true"
+            v-model:selection="selectedTimeEntryIds"
+          />
         </div>
 
         <!-- Totals -->

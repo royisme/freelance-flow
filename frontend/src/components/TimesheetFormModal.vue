@@ -114,7 +114,7 @@ watch(() => props.entry, (newEntry) => {
       description: newEntry.description,
       invoiced: newEntry.invoiced,
     })
-    billable.value = newEntry.billable
+    billable.value = !!newEntry.billable
   } else {
     resetForm()
   }

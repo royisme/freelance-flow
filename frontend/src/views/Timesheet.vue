@@ -13,6 +13,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
+  AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
 
 import QuickTimeEntry from '@/components/QuickTimeEntry.vue'
@@ -192,27 +193,32 @@ const columns = computed<ColumnDef<TimeEntry & { project?: { name: string } }>[]
           }
         }, () => h(Edit, { class: 'w-4 h-4' })),
         h(AlertDialog, {}, {
-          trigger: () => h(Button, {
-            variant: 'ghost',
-            size: 'icon',
-            class: 'h-8 w-8 text-destructive hover:text-destructive',
-          }, () => h(Trash2, { class: 'w-4 h-4' })),
-          default: () => h(AlertDialogContent, {}, {
-            default: () => [
-              h(AlertDialogHeader, {}, {
-                default: () => [
-                  h(AlertDialogTitle, {}, () => t('common.confirmDelete')),
-                  h(AlertDialogDescription, {}, () => t('timesheet.entry.deleteConfirm'))
-                ]
-              }),
-              h(AlertDialogFooter, {}, {
-                default: () => [
-                  h(AlertDialogCancel, {}, () => t('common.cancel')),
-                  h(AlertDialogAction, { onClick: () => handleDelete(entry.id) }, () => t('common.delete'))
-                ]
-              })
-            ]
-          })
+          default: () => [
+            h(AlertDialogTrigger, { asChild: true }, () => 
+              h(Button, {
+                variant: 'ghost',
+                size: 'icon',
+                class: 'h-8 w-8 text-destructive hover:text-destructive',
+                onClick: (e: MouseEvent) => e.stopPropagation()
+              }, () => h(Trash2, { class: 'w-4 h-4' }))
+            ),
+            h(AlertDialogContent, {}, {
+              default: () => [
+                h(AlertDialogHeader, {}, {
+                  default: () => [
+                    h(AlertDialogTitle, {}, () => t('common.confirmDelete')),
+                    h(AlertDialogDescription, {}, () => t('timesheet.entry.deleteConfirm'))
+                  ]
+                }),
+                h(AlertDialogFooter, {}, {
+                  default: () => [
+                    h(AlertDialogCancel, {}, () => t('common.cancel')),
+                    h(AlertDialogAction, { onClick: () => handleDelete(entry.id) }, () => t('common.delete'))
+                  ]
+                })
+              ]
+            })
+          ]
         })
       ])
     }

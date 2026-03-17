@@ -204,10 +204,12 @@ func (s *InvoiceService) UpdateStatus(userID int, invoiceID int, status string) 
 	return nil
 }
 
-// Delete removes an invoice by ID for a specific user.
+// Delete removes an invoice by ID for a specific user and unlinks associated time entries.
 func (s *InvoiceService) Delete(userID int, id int) {
-	_, err := s.db.Exec("DELETE FROM invoices WHERE id=? AND user_id=?", id, userID)
-	if err != nil {
+	if _, err := s.db.Exec("UPDATE time_entries SET invoice_id = NULL, invoiced = 0 WHERE user_id = ? AND invoice_id = ?", userID, id); err != nil {
+		log.Println("Error unlinking time entries from invoice:", err)
+	}
+	if _, err := s.db.Exec("DELETE FROM invoices WHERE id=? AND user_id=?", id, userID); err != nil {
 		log.Println("Error deleting invoice:", err)
 	}
 }

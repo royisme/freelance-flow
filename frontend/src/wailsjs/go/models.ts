@@ -1,5 +1,68 @@
 export namespace dto {
 	
+	export class AccountOutput {
+	    id: number;
+	    name: string;
+	    type: string;
+	    currency: string;
+	    balance: number;
+	    bankName: string;
+	    // Go type: time
+	    updatedAt: any;
+	
+	    static createFrom(source: any = {}) {
+	        return new AccountOutput(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.id = source["id"];
+	        this.name = source["name"];
+	        this.type = source["type"];
+	        this.currency = source["currency"];
+	        this.balance = source["balance"];
+	        this.bankName = source["bankName"];
+	        this.updatedAt = this.convertValues(source["updatedAt"], null);
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice && a.map) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
+	export class CategoryOutput {
+	    id: number;
+	    name: string;
+	    type: string;
+	    color: string;
+	    icon: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new CategoryOutput(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.id = source["id"];
+	        this.name = source["name"];
+	        this.type = source["type"];
+	        this.color = source["color"];
+	        this.icon = source["icon"];
+	    }
+	}
 	export class ChangePasswordInput {
 	    id: number;
 	    oldPassword: string;
@@ -54,6 +117,44 @@ export namespace dto {
 	        this.billingCity = source["billingCity"];
 	        this.billingProvince = source["billingProvince"];
 	        this.billingPostalCode = source["billingPostalCode"];
+	    }
+	}
+	export class CreateAccountInput {
+	    name: string;
+	    type: string;
+	    currency: string;
+	    balance: number;
+	    bankName: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new CreateAccountInput(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.name = source["name"];
+	        this.type = source["type"];
+	        this.currency = source["currency"];
+	        this.balance = source["balance"];
+	        this.bankName = source["bankName"];
+	    }
+	}
+	export class CreateCategoryInput {
+	    name: string;
+	    type: string;
+	    color: string;
+	    icon: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new CreateCategoryInput(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.name = source["name"];
+	        this.type = source["type"];
+	        this.color = source["color"];
+	        this.icon = source["icon"];
 	    }
 	}
 	export class CreateClientInput {
@@ -212,6 +313,40 @@ export namespace dto {
 	        this.description = source["description"];
 	        this.billable = source["billable"];
 	        this.invoiced = source["invoiced"];
+	    }
+	}
+	export class FinanceSummary {
+	    totalBalance: number;
+	    totalIncome: number;
+	    totalExpense: number;
+	    cashFlow: number;
+	
+	    static createFrom(source: any = {}) {
+	        return new FinanceSummary(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.totalBalance = source["totalBalance"];
+	        this.totalIncome = source["totalIncome"];
+	        this.totalExpense = source["totalExpense"];
+	        this.cashFlow = source["cashFlow"];
+	    }
+	}
+	export class ImportTransactionsInput {
+	    accountId: number;
+	    bankType: string;
+	    fileContent: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new ImportTransactionsInput(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.accountId = source["accountId"];
+	        this.bankType = source["bankType"];
+	        this.fileContent = source["fileContent"];
 	    }
 	}
 	export class InvoiceEmailSettings {
@@ -540,6 +675,113 @@ export namespace dto {
 	        this.description = source["description"];
 	        this.billable = source["billable"];
 	        this.invoiced = source["invoiced"];
+	    }
+	}
+	export class TransactionFilter {
+	    startDate?: string;
+	    endDate?: string;
+	    accountId?: number;
+	
+	    static createFrom(source: any = {}) {
+	        return new TransactionFilter(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.startDate = source["startDate"];
+	        this.endDate = source["endDate"];
+	        this.accountId = source["accountId"];
+	    }
+	}
+	export class TransactionOutput {
+	    id: number;
+	    accountId: number;
+	    categoryId?: number;
+	    categoryName?: string;
+	    categoryColor?: string;
+	    // Go type: time
+	    date: any;
+	    description: string;
+	    amount: number;
+	    status: string;
+	    referenceId: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new TransactionOutput(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.id = source["id"];
+	        this.accountId = source["accountId"];
+	        this.categoryId = source["categoryId"];
+	        this.categoryName = source["categoryName"];
+	        this.categoryColor = source["categoryColor"];
+	        this.date = this.convertValues(source["date"], null);
+	        this.description = source["description"];
+	        this.amount = source["amount"];
+	        this.status = source["status"];
+	        this.referenceId = source["referenceId"];
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice && a.map) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
+	export class UpdateAccountInput {
+	    id: number;
+	    name: string;
+	    type: string;
+	    currency: string;
+	    balance: number;
+	    bankName: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new UpdateAccountInput(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.id = source["id"];
+	        this.name = source["name"];
+	        this.type = source["type"];
+	        this.currency = source["currency"];
+	        this.balance = source["balance"];
+	        this.bankName = source["bankName"];
+	    }
+	}
+	export class UpdateCategoryInput {
+	    id: number;
+	    name: string;
+	    type: string;
+	    color: string;
+	    icon: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new UpdateCategoryInput(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.id = source["id"];
+	        this.name = source["name"];
+	        this.type = source["type"];
+	        this.color = source["color"];
+	        this.icon = source["icon"];
 	    }
 	}
 	export class UpdateClientInput {

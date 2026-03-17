@@ -36,4 +36,5 @@ yarn-error.log
 
 .works/
 .codex/
-test-results
+test-results.tldr
+.tldr
