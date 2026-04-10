@@ -18,6 +18,8 @@ func ToTimeEntryOutput(e models.TimeEntry) dto.TimeEntryOutput {
 		Description:     e.Description,
 		Billable:        e.Billable,
 		Invoiced:        e.Invoiced,
+		BillingMode:     e.BillingMode,
+		ManualAmount:    e.ManualAmount,
 	}
 }
 
@@ -36,6 +38,10 @@ func ToTimeEntryOutputList(entities []models.TimeEntry) []dto.TimeEntryOutput {
 // ToTimeEntryEntity converts CreateTimeEntryInput DTO to TimeEntry entity.
 // Note: InvoiceID defaults to 0 (unassigned) for new entries.
 func ToTimeEntryEntity(input dto.CreateTimeEntryInput) models.TimeEntry {
+	billingMode := input.BillingMode
+	if billingMode == "" {
+		billingMode = "hourly"
+	}
 	return models.TimeEntry{
 		ProjectID:       input.ProjectID,
 		InvoiceID:       0, // New entries are not assigned to an invoice
@@ -46,6 +52,8 @@ func ToTimeEntryEntity(input dto.CreateTimeEntryInput) models.TimeEntry {
 		Description:     input.Description,
 		Billable:        input.Billable,
 		Invoiced:        input.Invoiced,
+		BillingMode:     billingMode,
+		ManualAmount:    input.ManualAmount,
 	}
 }
 
@@ -60,4 +68,6 @@ func ApplyTimeEntryUpdate(e *models.TimeEntry, input dto.UpdateTimeEntryInput) {
 	e.Description = input.Description
 	e.Billable = input.Billable
 	e.Invoiced = input.Invoiced
+	e.BillingMode = input.BillingMode
+	e.ManualAmount = input.ManualAmount
 }

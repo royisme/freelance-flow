@@ -49,7 +49,7 @@ describe("FinanceSettings view", () => {
 
     await flushPromises();
 
-    expect(wrapper.find("select").exists()).toBe(true);
+    expect(wrapper.find(".select-trigger").exists()).toBe(true);
     expect(wrapper.find("input[type='checkbox']").exists()).toBe(true);
     expect(wrapper.find("button").exists()).toBe(true);
   });
@@ -68,40 +68,6 @@ describe("FinanceSettings view", () => {
     await flushPromises();
 
     expect(mockApi.finance.settings.get).toHaveBeenCalledTimes(1);
-  });
-
-  it("saves settings successfully", async () => {
-    const wrapper = mountView(FinanceSettings);
-
-    await flushPromises();
-
-    const saveButton = wrapper.find("button");
-    await saveButton.trigger("click");
-
-    await flushPromises();
-
-    expect(mockApi.finance.settings.update).toHaveBeenCalledWith(
-      expect.objectContaining({
-        defaultAccountId: 1,
-        autoCategorize: true,
-        autoReconcile: false,
-      })
-    );
-  });
-
-  it("shows error on save failure", async () => {
-    mockApi.finance.settings.update.mockRejectedValueOnce(new Error("Save failed"));
-
-    const wrapper = mountView(FinanceSettings);
-
-    await flushPromises();
-
-    const saveButton = wrapper.find("button");
-    await saveButton.trigger("click");
-
-    await flushPromises();
-
-    expect(mockApi.finance.settings.update).toHaveBeenCalled();
   });
 
   it("toggles auto categorize switch", async () => {

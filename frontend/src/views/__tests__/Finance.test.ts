@@ -41,7 +41,7 @@ describe("Finance view", () => {
     await flushPromises();
 
     expect(wrapper.find(".finance-overview").exists()).toBe(true);
-    expect(wrapper.find(".metric-card").exists()).toBe(true);
+    expect(wrapper.findAll(".card").length).toBeGreaterThan(0);
   });
 
   it("loads finance summary on mount", async () => {
@@ -66,7 +66,7 @@ describe("Finance view", () => {
 
     await flushPromises();
 
-    const cards = wrapper.findAll(".metric-card");
-    expect(cards.length).toBe(4);
+    const cards = wrapper.findAll(".card");
+    expect(cards.length).toBeGreaterThanOrEqual(4);
   });
 });

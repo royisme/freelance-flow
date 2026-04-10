@@ -55,7 +55,12 @@ func (s *StatusBarService) Get(userID int) (dto.StatusBarOutput, error) {
 
 	var uninvoicedTotal float64
 	if err := s.db.QueryRow(
-		`SELECT COALESCE(SUM((te.duration_seconds / 3600.0) * COALESCE(p.hourly_rate, 0)), 0)
+		`SELECT COALESCE(SUM(
+			CASE
+				WHEN te.billing_mode = 'fixed' THEN COALESCE(te.manual_amount, 0)
+				ELSE (te.duration_seconds / 3600.0) * COALESCE(p.hourly_rate, 0)
+			END
+		), 0)
 		 FROM time_entries te
 		 JOIN projects p ON p.id = te.project_id AND p.user_id = te.user_id
 		 WHERE te.user_id = ?

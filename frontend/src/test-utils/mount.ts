@@ -1,6 +1,7 @@
 import { mount, type MountingOptions } from "@vue/test-utils";
 import { createPinia } from "pinia";
 import type { Component } from "vue";
+import { defineComponent, h } from "vue";
 
 const naiveStubs = {
   NForm: {
@@ -111,6 +112,71 @@ const naiveStubs = {
   NTooltip: {
     template: '<div class="n-tooltip"><slot /></div>',
   },
+  Dialog: defineComponent({
+    name: "Dialog",
+    props: { open: Boolean },
+    emits: ["update:open"],
+    setup(props, { slots }) {
+      return () => (props.open ? h("div", { class: "dialog-stub" }, slots.default?.()) : null);
+    },
+  }),
+  DialogContent: { template: '<div class="dialog-content"><slot /></div>' },
+  DialogHeader: { template: '<div class="dialog-header"><slot /></div>' },
+  DialogTitle: { template: '<div class="dialog-title"><slot /></div>' },
+  DialogFooter: { template: '<div class="dialog-footer"><slot /></div>' },
+  DialogDescription: { template: '<div class="dialog-description"><slot /></div>' },
+  AlertDialog: {
+    props: ["open"],
+    emits: ["update:open"],
+    template: '<div class="alert-dialog"><slot /></div>',
+  },
+  AlertDialogTrigger: { template: '<div class="alert-dialog-trigger"><slot /></div>' },
+  AlertDialogContent: { template: '<div class="alert-dialog-content"><slot /></div>' },
+  AlertDialogHeader: { template: '<div class="alert-dialog-header"><slot /></div>' },
+  AlertDialogTitle: { template: '<div class="alert-dialog-title"><slot /></div>' },
+  AlertDialogDescription: { template: '<div class="alert-dialog-description"><slot /></div>' },
+  AlertDialogFooter: { template: '<div class="alert-dialog-footer"><slot /></div>' },
+  AlertDialogAction: {
+    emits: ["click"],
+    template: '<button class="alert-dialog-action" @click="$emit(\'click\')"><slot /></button>',
+  },
+  AlertDialogCancel: {
+    emits: ["click"],
+    template: '<button class="alert-dialog-cancel" @click="$emit(\'click\')"><slot /></button>',
+  },
+  Select: {
+    props: ["modelValue", "disabled"],
+    emits: ["update:modelValue"],
+    template: '<div class="select-stub"><slot /></div>',
+  },
+  SelectTrigger: { template: '<button class="select-trigger"><slot /></button>' },
+  SelectValue: {
+    props: ["placeholder"],
+    template: '<span class="select-value">{{ placeholder }}</span>',
+  },
+  SelectContent: { template: '<div class="select-content"><slot /></div>' },
+  SelectItem: {
+    props: ["value"],
+    template: '<div class="select-item" :data-value="value"><slot /></div>',
+  },
+  SelectGroup: { template: '<div class="select-group"><slot /></div>' },
+  Switch: {
+    props: ["checked", "disabled"],
+    emits: ["update:checked"],
+    template:
+      '<input type="checkbox" :checked="checked" :disabled="disabled" @change="$emit(\'update:checked\', $event.target.checked)" />',
+  },
+  Tabs: { template: '<div class="tabs"><slot /></div>' },
+  TabsList: { template: '<div class="tabs-list"><slot /></div>' },
+  TabsTrigger: { template: '<button class="tabs-trigger"><slot /></button>' },
+  TabsContent: { template: '<div class="tabs-content"><slot /></div>' },
+  Card: { template: '<div class="card"><slot /></div>' },
+  CardHeader: { template: '<div class="card-header"><slot /></div>' },
+  CardTitle: { template: '<div class="card-title"><slot /></div>' },
+  CardContent: { template: '<div class="card-content"><slot /></div>' },
+  Alert: { template: '<div class="alert"><slot /></div>' },
+  AlertTitle: { template: '<div class="alert-title"><slot /></div>' },
+  AlertDescription: { template: '<div class="alert-description"><slot /></div>' },
 };
 
 export function mountView<T extends Component>(

@@ -144,12 +144,28 @@ const eligibleTimeEntries = computed(() =>
   })
 )
 
+function getTimeEntryAmount(entry: TimeEntry): number {
+  if (entry.billingMode === 'fixed') {
+    return entry.manualAmount ?? 0
+  }
+  const project = projectsData.value.find((p) => p.id === entry.projectId)
+  const rate = project?.hourlyRate ?? 0
+  return (entry.durationSeconds / 3600) * rate
+}
+
 const selectedHours = computed(() => {
   const selectedSet = new Set(selectedTimeEntryIds.value)
   const totalSeconds = eligibleTimeEntries.value
     .filter((e) => selectedSet.has(e.id))
     .reduce((sum, e) => sum + e.durationSeconds, 0)
   return totalSeconds / 3600
+})
+
+const selectedSubtotal = computed(() => {
+  const selectedSet = new Set(selectedTimeEntryIds.value)
+  return eligibleTimeEntries.value
+    .filter((e) => selectedSet.has(e.id))
+    .reduce((sum, entry) => sum + getTimeEntryAmount(entry), 0)
 })
 
 // Time entries table columns
@@ -167,7 +183,13 @@ const timeEntryColumns: ColumnDef<TimeEntry>[] = [
   {
     accessorKey: 'durationSeconds',
     header: () => t('invoices.selectEntries.columns.hours'),
-    cell: ({ row }) => (row.original.durationSeconds / 3600).toFixed(2),
+    cell: ({ row }) => row.original.billingMode === 'fixed' ? '-' : (row.original.durationSeconds / 3600).toFixed(2),
+    meta: { class: 'text-right' },
+  },
+  {
+    id: 'amount',
+    header: () => t('invoices.columns.amount'),
+    cell: ({ row }) => getTimeEntryAmount(row.original).toFixed(2),
     meta: { class: 'text-right' },
   },
 ]
@@ -310,28 +332,7 @@ watch(
 watch(
   () => selectedTimeEntryIds.value,
   () => {
-    // Need entries to be loaded
-    const selectedSet = new Set(selectedTimeEntryIds.value)
-    const totalSeconds = eligibleTimeEntries.value
-      .filter((e) => selectedSet.has(e.id))
-      .reduce((sum, e) => sum + e.durationSeconds, 0)
-
-    console.log('[InvoiceFormModal] Calculating totals:')
-    console.log('  - selectedTimeEntryIds:', selectedTimeEntryIds.value)
-    console.log('  - eligibleTimeEntries:', eligibleTimeEntries.value)
-    console.log('  - totalSeconds:', totalSeconds)
-    console.log('  - selectedProjectRate:', selectedProjectRate.value)
-
-    // If initialization hasn't happened or projects not loaded, projectRate might be 0.
-    // Calculations should still happen.
-    const hours = totalSeconds / 3600
-    const subtotal = hours * selectedProjectRate.value
-
-    console.log('  - hours:', hours)
-    console.log('  - subtotal:', subtotal)
-
-    // We update form values. 
-    // IMPORTANT: form.setFieldValue triggers validation.
+    const subtotal = selectedSubtotal.value
     form.setFieldValue('subtotal', subtotal)
 
     const taxRate = form.values.taxRate || 0
@@ -346,14 +347,7 @@ watch(
 watch(
   () => selectedProjectRate.value,
   () => {
-    const selectedSet = new Set(selectedTimeEntryIds.value)
-    const totalSeconds = eligibleTimeEntries.value
-      .filter((e) => selectedSet.has(e.id))
-      .reduce((sum, e) => sum + e.durationSeconds, 0)
-
-    const hours = totalSeconds / 3600
-    const subtotal = hours * selectedProjectRate.value
-
+    const subtotal = selectedSubtotal.value
     form.setFieldValue('subtotal', subtotal)
 
     const taxRate = form.values.taxRate || 0

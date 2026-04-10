@@ -3,9 +3,9 @@ package services
 import (
 	"database/sql"
 	"fmt"
-	"tally/internal/dto"
 	"log"
 	"strings"
+	"tally/internal/dto"
 )
 
 // ReportService provides aggregated income/hours reports.
@@ -75,7 +75,10 @@ SELECT te.date,
        c.id, c.name,
        p.id, p.name,
        SUM(te.duration_seconds) / 3600.0 AS hours,
-       SUM((te.duration_seconds / 3600.0) * COALESCE(p.hourly_rate, 0)) AS income
+       SUM(CASE
+           WHEN te.billing_mode = 'fixed' THEN COALESCE(te.manual_amount, 0)
+           ELSE (te.duration_seconds / 3600.0) * COALESCE(p.hourly_rate, 0)
+       END) AS income
 FROM time_entries te
 JOIN projects p ON te.project_id = p.id
 JOIN clients c ON p.client_id = c.id
@@ -116,7 +119,10 @@ func (s *ReportService) queryChartSeries(userID int, filter dto.ReportFilter) (d
 	query := `
 SELECT te.date,
        SUM(te.duration_seconds) / 3600.0 AS hours,
-       SUM((te.duration_seconds / 3600.0) * COALESCE(p.hourly_rate, 0)) AS income
+       SUM(CASE
+           WHEN te.billing_mode = 'fixed' THEN COALESCE(te.manual_amount, 0)
+           ELSE (te.duration_seconds / 3600.0) * COALESCE(p.hourly_rate, 0)
+       END) AS income
 FROM time_entries te
 JOIN projects p ON te.project_id = p.id
 JOIN clients c ON p.client_id = c.id

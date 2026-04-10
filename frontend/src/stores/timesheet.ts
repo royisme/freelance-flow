@@ -84,6 +84,8 @@ export const useTimesheetStore = defineStore("timesheet", () => {
         durationSeconds: 0,
         billable: entry.billable,
         invoiced: false,
+        billingMode: entry.billingMode ?? "hourly",
+        manualAmount: entry.billingMode === "fixed" ? (entry.manualAmount ?? 0) : null,
       });
       await fetchTimesheet();
     } finally {

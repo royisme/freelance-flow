@@ -34,6 +34,7 @@ func TestTimesheetService_CRUD(t *testing.T) {
 		Description:     "work",
 		Billable:        true,
 		Invoiced:        false,
+		BillingMode:     "hourly",
 	})
 	assert.NotZero(t, created.ID)
 
@@ -47,8 +48,10 @@ func TestTimesheetService_CRUD(t *testing.T) {
 	got, err := tsSvc.Get(user.ID, created.ID)
 	assert.NoError(t, err)
 	assert.Equal(t, "work", got.Description)
+	assert.Equal(t, "hourly", got.BillingMode)
 
 	// Update
+	fixedAmount := 500.0
 	updated := tsSvc.Update(user.ID, dto.UpdateTimeEntryInput{
 		ID:              created.ID,
 		ProjectID:       project.ID,
@@ -60,13 +63,16 @@ func TestTimesheetService_CRUD(t *testing.T) {
 		Description:     "work2",
 		Billable:        false,
 		Invoiced:        false,
+		BillingMode:     "fixed",
+		ManualAmount:    &fixedAmount,
 	})
 	assert.Equal(t, created.ID, updated.ID)
 	assert.Equal(t, 1800, updated.DurationSeconds)
 	assert.False(t, updated.Billable)
+	assert.Equal(t, "fixed", updated.BillingMode)
+	assert.NotNil(t, updated.ManualAmount)
 
 	// Delete
 	tsSvc.Delete(user.ID, created.ID)
 	assert.Len(t, tsSvc.List(user.ID, 0), 0)
 }
-

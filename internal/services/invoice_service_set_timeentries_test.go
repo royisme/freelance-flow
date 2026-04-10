@@ -35,7 +35,9 @@ func TestInvoiceService_SetTimeEntries_RecalculateTotals(t *testing.T) {
 			duration_seconds INTEGER,
 			description TEXT,
 			billable BOOLEAN DEFAULT 1,
-			invoiced BOOLEAN DEFAULT 0
+			invoiced BOOLEAN DEFAULT 0,
+			billing_mode TEXT NOT NULL DEFAULT 'hourly',
+			manual_amount REAL
 		);`,
 	}
 	for _, q := range schema {
@@ -56,27 +58,30 @@ func TestInvoiceService_SetTimeEntries_RecalculateTotals(t *testing.T) {
 	assert.NoError(t, err)
 
 	// two time entries: 1h and 2h
-	_, err = db.Exec(`INSERT INTO time_entries(user_id, project_id, date, duration_seconds, billable, invoiced) VALUES (1, 1, '2023-01-01', 3600, 1, 0)`)
+	_, err = db.Exec(`INSERT INTO time_entries(user_id, project_id, date, duration_seconds, billable, invoiced, billing_mode, manual_amount) VALUES (1, 1, '2023-01-01', 3600, 1, 0, 'hourly', NULL)`)
 	assert.NoError(t, err)
-	_, err = db.Exec(`INSERT INTO time_entries(user_id, project_id, date, duration_seconds, billable, invoiced) VALUES (1, 1, '2023-01-02', 7200, 1, 0)`)
+	_, err = db.Exec(`INSERT INTO time_entries(user_id, project_id, date, duration_seconds, billable, invoiced, billing_mode, manual_amount) VALUES (1, 1, '2023-01-02', 7200, 1, 0, 'hourly', NULL)`)
+	assert.NoError(t, err)
+	_, err = db.Exec(`INSERT INTO time_entries(user_id, project_id, date, duration_seconds, description, billable, invoiced, billing_mode, manual_amount) VALUES (1, 1, '2023-01-03', 0, 'Monthly maintenance', 1, 0, 'fixed', 50)`)
 	assert.NoError(t, err)
 
 	out, err := invoiceSvc.SetTimeEntries(1, dto.SetInvoiceTimeEntriesInput{
 		InvoiceID:    1,
-		TimeEntryIDs: []int{1, 2},
+		TimeEntryIDs: []int{1, 2, 3},
 	})
 	assert.NoError(t, err)
 
-	// subtotal = (3 hours * 100), tax 10%, total = 330
-	assert.InDelta(t, 300.0, out.Subtotal, 0.001)
-	assert.InDelta(t, 30.0, out.TaxAmount, 0.001)
-	assert.InDelta(t, 330.0, out.Total, 0.001)
-	assert.Len(t, out.Items, 1)
-	assert.InDelta(t, 300.0, out.Items[0].Amount, 0.001)
+	// subtotal = (3 hours * 100) + 50 fixed, tax 10%, total = 385
+	assert.InDelta(t, 350.0, out.Subtotal, 0.001)
+	assert.InDelta(t, 35.0, out.TaxAmount, 0.001)
+	assert.InDelta(t, 385.0, out.Total, 0.001)
+	assert.Len(t, out.Items, 2)
+	assert.InDelta(t, 300.0, out.Items[1].Amount, 0.001)
+	assert.InDelta(t, 50.0, out.Items[0].Amount, 0.001)
 
 	// ensure time entries flagged and linked
 	var count int
 	err = db.QueryRow("SELECT COUNT(*) FROM time_entries WHERE invoice_id = 1 AND invoiced = 1").Scan(&count)
 	assert.NoError(t, err)
-	assert.Equal(t, 2, count)
+	assert.Equal(t, 3, count)
 }

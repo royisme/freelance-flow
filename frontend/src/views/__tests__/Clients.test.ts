@@ -34,6 +34,10 @@ vi.mock("vue-i18n", () => ({
   }),
 }));
 
+vi.mock("vue-router", () => ({
+  useRouter: () => ({ push: vi.fn(), replace: vi.fn() }),
+}));
+
 describe("Clients view", () => {
   const mockClients: Client[] = [
     {
@@ -67,6 +71,6 @@ describe("Clients view", () => {
     expect(mockApi.clients.list).toHaveBeenCalledTimes(1);
     const clientStore = useClientStore();
     expect(clientStore.clients.length).toBe(2);
-    expect(wrapper.text()).toContain("clients.title");
+    expect(wrapper.text()).toContain("clients.addClient");
   });
 });

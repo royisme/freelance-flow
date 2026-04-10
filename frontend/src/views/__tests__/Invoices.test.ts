@@ -89,6 +89,8 @@ describe("Invoices view", () => {
       endTime: "10:00",
       billable: true,
       invoiced: false,
+      billingMode: "hourly",
+      manualAmount: null,
     },
   ];
 
@@ -125,6 +127,6 @@ describe("Invoices view", () => {
     expect(mockApi.invoices.list).toHaveBeenCalled();
     expect(mockApi.clients.list).toHaveBeenCalled();
     expect(mockApi.timeEntries.list).toHaveBeenCalled();
-    expect(wrapper.text()).toContain("invoices.title");
+    expect(wrapper.text()).toContain("invoices.createInvoice");
   });
 });

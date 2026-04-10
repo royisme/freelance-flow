@@ -35,25 +35,32 @@ func TestStatusBarService_Get_CurrentMonthAndUnpaid(t *testing.T) {
 
 	// Insert two time entries: one current month, one previous month.
 	if _, err := db.Exec(
-		`INSERT INTO time_entries(user_id, project_id, invoice_id, date, start_time, end_time, duration_seconds, description, billable, invoiced)
-		 VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-		user.ID, project.ID, nil, monthStart.Format("2006-01-02"), "", "", 3600, "this month", true, false,
+		`INSERT INTO time_entries(user_id, project_id, invoice_id, date, start_time, end_time, duration_seconds, description, billable, invoiced, billing_mode, manual_amount)
+		 VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+		user.ID, project.ID, nil, monthStart.Format("2006-01-02"), "", "", 3600, "this month", true, false, "hourly", nil,
 	); err != nil {
 		t.Fatalf("failed to insert current-month time entry: %v", err)
 	}
 	if _, err := db.Exec(
-		`INSERT INTO time_entries(user_id, project_id, invoice_id, date, start_time, end_time, duration_seconds, description, billable, invoiced)
-		 VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-		user.ID, project.ID, nil, monthStart.Format("2006-01-02"), "", "", 3600, "invoiced", true, true,
+		`INSERT INTO time_entries(user_id, project_id, invoice_id, date, start_time, end_time, duration_seconds, description, billable, invoiced, billing_mode, manual_amount)
+		 VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+		user.ID, project.ID, nil, monthStart.Format("2006-01-02"), "", "", 3600, "invoiced", true, true, "hourly", nil,
 	); err != nil {
 		t.Fatalf("failed to insert invoiced time entry: %v", err)
 	}
 	if _, err := db.Exec(
-		`INSERT INTO time_entries(user_id, project_id, invoice_id, date, start_time, end_time, duration_seconds, description, billable, invoiced)
-		 VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-		user.ID, project.ID, nil, prevMonth.Format("2006-01-02"), "", "", 7200, "prev month", true, false,
+		`INSERT INTO time_entries(user_id, project_id, invoice_id, date, start_time, end_time, duration_seconds, description, billable, invoiced, billing_mode, manual_amount)
+		 VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+		user.ID, project.ID, nil, prevMonth.Format("2006-01-02"), "", "", 7200, "prev month", true, false, "hourly", nil,
 	); err != nil {
 		t.Fatalf("failed to insert prev-month time entry: %v", err)
+	}
+	if _, err := db.Exec(
+		`INSERT INTO time_entries(user_id, project_id, invoice_id, date, start_time, end_time, duration_seconds, description, billable, invoiced, billing_mode, manual_amount)
+		 VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+		user.ID, project.ID, nil, monthStart.Format("2006-01-02"), "", "", 0, "maintenance", true, false, "fixed", 250.0,
+	); err != nil {
+		t.Fatalf("failed to insert fixed time entry: %v", err)
 	}
 
 	// Insert two invoices: one unpaid, one paid.
@@ -88,8 +95,8 @@ func TestStatusBarService_Get_CurrentMonthAndUnpaid(t *testing.T) {
 	if out.MonthSeconds != 7200 {
 		t.Fatalf("expected MonthSeconds=7200, got %d", out.MonthSeconds)
 	}
-	if out.UninvoicedTotal != 300 {
-		t.Fatalf("expected UninvoicedTotal=300, got %v", out.UninvoicedTotal)
+	if out.UninvoicedTotal != 550 {
+		t.Fatalf("expected UninvoicedTotal=550, got %v", out.UninvoicedTotal)
 	}
 	if out.UnpaidTotal != 100 {
 		t.Fatalf("expected UnpaidTotal=100, got %v", out.UnpaidTotal)

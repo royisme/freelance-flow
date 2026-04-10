@@ -247,6 +247,12 @@ export default {
       project: "项目",
       date: "日期",
       duration: "时长（小时）",
+      billingMode: "计费方式",
+      billingModes: {
+        hourly: "按小时",
+        fixed: "固定费用",
+      },
+      manualAmount: "手动金额",
       description: "工作描述",
       descriptionPlaceholder: "您完成了什么工作？",
       timeRange: "时间段（可选）",

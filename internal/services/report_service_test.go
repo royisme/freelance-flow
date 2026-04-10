@@ -46,14 +46,17 @@ func TestReportService_AggregationAndIsolation(t *testing.T) {
 		EndTime:         "11:00",
 		DurationSeconds: 7200,
 		Billable:        true,
+		BillingMode:     "hourly",
 	})
+	fixedAmount := 150.0
 	_ = timeService.Create(userA.ID, dto.CreateTimeEntryInput{
 		ProjectID:       projectA.ID,
 		Date:            "2025-01-02",
-		StartTime:       "09:00",
-		EndTime:         "10:00",
-		DurationSeconds: 3600,
+		DurationSeconds: 0,
+		Description:     "Maintenance",
 		Billable:        true,
+		BillingMode:     "fixed",
+		ManualAmount:    &fixedAmount,
 	})
 
 	// User B entry: 3h on same date, should not leak to user A.
@@ -64,6 +67,7 @@ func TestReportService_AggregationAndIsolation(t *testing.T) {
 		EndTime:         "12:00",
 		DurationSeconds: 10800,
 		Billable:        true,
+		BillingMode:     "hourly",
 	})
 
 	svc := NewReportService(db)
@@ -75,11 +79,11 @@ func TestReportService_AggregationAndIsolation(t *testing.T) {
 	if err != nil {
 		t.Fatalf("report get failed: %v", err)
 	}
-	if reportA.TotalHours != 3 {
-		t.Errorf("expected total hours 3, got %v", reportA.TotalHours)
+	if reportA.TotalHours != 2 {
+		t.Errorf("expected total hours 2, got %v", reportA.TotalHours)
 	}
-	if reportA.TotalIncome != 300 {
-		t.Errorf("expected total income 300, got %v", reportA.TotalIncome)
+	if reportA.TotalIncome != 350 {
+		t.Errorf("expected total income 350, got %v", reportA.TotalIncome)
 	}
 	if len(reportA.Rows) != 2 {
 		t.Fatalf("expected 2 rows for user A, got %d", len(reportA.Rows))
@@ -99,7 +103,7 @@ func TestReportService_AggregationAndIsolation(t *testing.T) {
 	if err != nil {
 		t.Fatalf("report get with client filter failed: %v", err)
 	}
-	if reportAClient.TotalHours != 3 || reportAClient.TotalIncome != 300 {
+	if reportAClient.TotalHours != 2 || reportAClient.TotalIncome != 350 {
 		t.Errorf("unexpected totals with client filter: %+v", reportAClient)
 	}
 }

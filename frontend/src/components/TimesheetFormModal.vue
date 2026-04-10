@@ -68,6 +68,7 @@ const form = useForm({
 
 // Access values
 const formValues = form.values
+const isFixedBilling = computed(() => formValues.billingMode === 'fixed')
 
 // Duration Hours Computed Helper
 const durationHours = computed({
@@ -113,6 +114,8 @@ watch(() => props.entry, (newEntry) => {
       durationSeconds: newEntry.durationSeconds,
       description: newEntry.description,
       invoiced: newEntry.invoiced,
+      billingMode: newEntry.billingMode || 'hourly',
+      manualAmount: newEntry.manualAmount ?? null,
     })
     billable.value = !!newEntry.billable
   } else {
@@ -129,7 +132,9 @@ function resetForm() {
       endTime: undefined,
       durationSeconds: 0,
       description: '',
-      invoiced: false
+      invoiced: false,
+      billingMode: 'hourly',
+      manualAmount: null,
     }
   })
   billable.value = true
@@ -153,6 +158,8 @@ const onSubmit = form.handleSubmit((values) => {
     durationSeconds: values.durationSeconds,
     description: values.description,
     invoiced: values.invoiced,
+    billingMode: values.billingMode,
+    manualAmount: values.billingMode === 'fixed' ? values.manualAmount ?? 0 : null,
     billable: billable.value,
     invoiceId: props.entry?.invoiceId || 0
   }
@@ -221,7 +228,35 @@ const onSubmit = form.handleSubmit((values) => {
           <FormItem>
             <FormLabel>{{ t('timesheet.form.duration') }}</FormLabel>
             <FormControl>
-              <Input type="number" step="0.25" min="0" v-model="durationHours" placeholder="0.00" />
+              <Input type="number" step="0.25" min="0" v-model="durationHours" placeholder="0.00" :disabled="isFixedBilling" />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        </FormField>
+
+        <FormField v-slot="{ componentField }" name="billingMode">
+          <FormItem>
+            <FormLabel>{{ t('timesheet.form.billingMode') }}</FormLabel>
+            <Select v-bind="componentField" :model-value="componentField.modelValue">
+              <FormControl>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+              </FormControl>
+              <SelectContent>
+                <SelectItem value="hourly">{{ t('timesheet.form.billingModes.hourly') }}</SelectItem>
+                <SelectItem value="fixed">{{ t('timesheet.form.billingModes.fixed') }}</SelectItem>
+              </SelectContent>
+            </Select>
+            <FormMessage />
+          </FormItem>
+        </FormField>
+
+        <FormField v-if="isFixedBilling" v-slot="{ componentField }" name="manualAmount">
+          <FormItem>
+            <FormLabel>{{ t('timesheet.form.manualAmount') }}</FormLabel>
+            <FormControl>
+              <Input type="number" step="0.01" min="0" v-bind="componentField" />
             </FormControl>
             <FormMessage />
           </FormItem>

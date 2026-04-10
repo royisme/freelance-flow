@@ -298,6 +298,8 @@ export namespace dto {
 	    description: string;
 	    billable: boolean;
 	    invoiced: boolean;
+	    billingMode: string;
+	    manualAmount?: number | null;
 	
 	    static createFrom(source: any = {}) {
 	        return new CreateTimeEntryInput(source);
@@ -313,6 +315,8 @@ export namespace dto {
 	        this.description = source["description"];
 	        this.billable = source["billable"];
 	        this.invoiced = source["invoiced"];
+	        this.billingMode = source["billingMode"];
+	        this.manualAmount = source["manualAmount"];
 	    }
 	}
 	export class FinanceSummary {
@@ -658,6 +662,8 @@ export namespace dto {
 	    description: string;
 	    billable: boolean;
 	    invoiced: boolean;
+	    billingMode: string;
+	    manualAmount?: number;
 	
 	    static createFrom(source: any = {}) {
 	        return new TimeEntryOutput(source);
@@ -675,6 +681,8 @@ export namespace dto {
 	        this.description = source["description"];
 	        this.billable = source["billable"];
 	        this.invoiced = source["invoiced"];
+	        this.billingMode = source["billingMode"];
+	        this.manualAmount = source["manualAmount"];
 	    }
 	}
 	export class TransactionFilter {
@@ -915,6 +923,8 @@ export namespace dto {
 	    description: string;
 	    billable: boolean;
 	    invoiced: boolean;
+	    billingMode: string;
+	    manualAmount?: number;
 	
 	    static createFrom(source: any = {}) {
 	        return new UpdateTimeEntryInput(source);
@@ -932,6 +942,8 @@ export namespace dto {
 	        this.description = source["description"];
 	        this.billable = source["billable"];
 	        this.invoiced = source["invoiced"];
+	        this.billingMode = source["billingMode"];
+	        this.manualAmount = source["manualAmount"];
 	    }
 	}
 	export class UpdateUserInput {

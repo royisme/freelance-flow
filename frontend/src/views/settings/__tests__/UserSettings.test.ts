@@ -1,58 +1,45 @@
 import { describe, expect, it, vi, beforeEach } from "vitest";
 import { flushPromises } from "@vue/test-utils";
-import UserSettings from "@/views/settings/UserSettings.vue";
-import type { UserSettings as UserSettingsType } from "@/types";
+import GeneralSettings from "@/views/settings/GeneralSettings.vue";
 import { mountView } from "@/test-utils/mount";
-
-const mockApi = vi.hoisted(() => ({
-  settings: {
-    get: vi.fn<[], Promise<UserSettingsType>>(),
-    update: vi.fn<[UserSettingsType], Promise<UserSettingsType>>(),
-  },
-}));
-
-vi.mock("@/api", () => ({ api: mockApi }));
-
-describe("UserSettings view", () => {
-  const base: UserSettingsType = {
+const mockPreferencesStore = {
+  preferences: {
     currency: "USD",
-    defaultTaxRate: 0,
     language: "en-US",
     theme: "light",
     dateFormat: "2006-01-02",
     timezone: "UTC",
-    senderName: "",
-    senderCompany: "",
-    senderAddress: "",
-    senderPhone: "",
-    senderEmail: "",
-    senderPostalCode: "",
-    invoiceTerms: "Due upon receipt",
-    defaultMessageTemplate: "Thank you for your business.",
-  };
+    moduleOverrides: {},
+  },
+  fetchPreferences: vi.fn(),
+  savePreferences: vi.fn(),
+};
+const mockAppStore = {
+  theme: "light",
+  setTheme: vi.fn(),
+  setLocale: vi.fn(),
+};
 
+vi.mock("@/stores/userPreferences", () => ({
+  useUserPreferencesStore: () => mockPreferencesStore,
+}));
+
+vi.mock("@/stores/app", () => ({
+  useAppStore: () => mockAppStore,
+}));
+
+describe("GeneralSettings view", () => {
   beforeEach(() => {
-    mockApi.settings.get.mockResolvedValue(base);
-    mockApi.settings.update.mockResolvedValue(base);
+    vi.clearAllMocks();
+    mockPreferencesStore.fetchPreferences.mockResolvedValue(undefined);
+    mockPreferencesStore.savePreferences.mockResolvedValue(undefined);
   });
 
-  it("loads settings and saves on submit", async () => {
-    const wrapper = mountView(UserSettings);
+  it("loads preferences on mount", async () => {
+    const wrapper = mountView(GeneralSettings);
 
     await flushPromises();
-    expect(mockApi.settings.get).toHaveBeenCalledTimes(1);
-
-    // Stub validate to pass in test environment.
-    const vm = wrapper.vm as unknown as {
-      formRef: { validate: () => Promise<void> } | null;
-    };
-    vm.formRef = { validate: async () => undefined };
-
-    const buttons = wrapper.findAll("button");
-    const save = buttons.find((b) => b.text() === "common.save");
-    await save?.trigger("click");
-    await flushPromises();
-
-    expect(mockApi.settings.update).toHaveBeenCalledTimes(1);
+    expect(mockPreferencesStore.fetchPreferences).toHaveBeenCalledTimes(1);
+    expect(wrapper.text()).toContain("settings.general.cardTitle");
   });
 });

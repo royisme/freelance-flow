@@ -5,11 +5,11 @@ import type { Project } from "@/types";
 import { defineComponent } from "vue";
 
 describe("TimesheetFormModal", () => {
-  const NModalStub = defineComponent({
-    name: "NModal",
-    props: { show: { type: Boolean, default: false } },
-    emits: ["update:show"],
-    template: '<div class="n-modal" v-if="show"><slot /></div>',
+  const DialogStub = defineComponent({
+    name: "Dialog",
+    props: { open: { type: Boolean, default: false } },
+    emits: ["update:open"],
+    template: '<div class="dialog-stub" v-if="open"><slot /></div>',
   });
 
   const projects: Project[] = [
@@ -29,7 +29,7 @@ describe("TimesheetFormModal", () => {
     },
   ];
 
-  it("forwards NModal update:show=true instead of forcing close", async () => {
+  it("forwards Dialog update:open=true", async () => {
     const wrapper = shallowMount(TimesheetFormModal, {
       props: {
         show: true,
@@ -38,17 +38,17 @@ describe("TimesheetFormModal", () => {
       },
       global: {
         stubs: {
-          NModal: NModalStub,
+          Dialog: DialogStub,
         },
       },
     });
 
-    wrapper.findComponent({ name: "NModal" }).vm.$emit("update:show", true);
+    wrapper.findComponent({ name: "Dialog" }).vm.$emit("update:open", true);
 
     expect(wrapper.emitted("update:show")?.[0]).toEqual([true]);
   });
 
-  it("forwards NModal update:show=false", async () => {
+  it("forwards Dialog update:open=false", async () => {
     const wrapper = shallowMount(TimesheetFormModal, {
       props: {
         show: true,
@@ -57,12 +57,12 @@ describe("TimesheetFormModal", () => {
       },
       global: {
         stubs: {
-          NModal: NModalStub,
+          Dialog: DialogStub,
         },
       },
     });
 
-    wrapper.findComponent({ name: "NModal" }).vm.$emit("update:show", false);
+    wrapper.findComponent({ name: "Dialog" }).vm.$emit("update:open", false);
 
     expect(wrapper.emitted("update:show")?.[0]).toEqual([false]);
   });

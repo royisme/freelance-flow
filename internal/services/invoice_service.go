@@ -527,16 +527,19 @@ ORDER BY date ASC, start_time ASC`
 // recalculateInvoiceFromTimeEntries recalculates subtotal/tax/total and items_json based on linked time entries.
 func (s *InvoiceService) recalculateInvoiceFromTimeEntries(userID int, invoiceID int, taxRate float64) (dto.InvoiceOutput, error) {
 	type entryRow struct {
-		ProjectID   int
-		Project     string
-		Hourly      float64
-		Currency    string
-		ServiceType string
-		Hours       float64
+		ProjectID    int
+		Project      string
+		Hourly       float64
+		Currency     string
+		ServiceType  string
+		Hours        float64
+		BillingMode  string
+		ManualAmount sql.NullFloat64
+		Description  string
 	}
 
 	rows, err := s.db.Query(`
-SELECT p.id, p.name, COALESCE(p.hourly_rate, 0), COALESCE(p.currency, ''), COALESCE(p.service_type, ''), te.duration_seconds
+SELECT p.id, p.name, COALESCE(p.hourly_rate, 0), COALESCE(p.currency, ''), COALESCE(p.service_type, ''), te.duration_seconds, COALESCE(te.billing_mode, 'hourly'), te.manual_amount, COALESCE(te.description, '')
 FROM time_entries te
 JOIN projects p ON te.project_id = p.id
 WHERE te.user_id = ? AND te.invoice_id = ?`, userID, invoiceID)
@@ -546,13 +549,35 @@ WHERE te.user_id = ? AND te.invoice_id = ?`, userID, invoiceID)
 	defer closeWithLog(rows, "closing recalc time entries rows")
 
 	projectHours := map[int]entryRow{}
+	var items []models.InvoiceItem
+	var subtotal float64
 	for rows.Next() {
 		var pid int
 		var name, currency, serviceType string
 		var rate float64
 		var seconds int
-		if err := rows.Scan(&pid, &name, &rate, &currency, &serviceType, &seconds); err != nil {
+		var billingMode, description string
+		var manualAmount sql.NullFloat64
+		if err := rows.Scan(&pid, &name, &rate, &currency, &serviceType, &seconds, &billingMode, &manualAmount, &description); err != nil {
 			log.Println("Error scanning time entry for recalc:", err)
+			continue
+		}
+		if billingMode == "fixed" {
+			amount := 0.0
+			if manualAmount.Valid {
+				amount = manualAmount.Float64
+			}
+			itemDescription := strings.TrimSpace(description)
+			if itemDescription == "" {
+				itemDescription = name
+			}
+			items = append(items, models.InvoiceItem{
+				Description: itemDescription,
+				Quantity:    1,
+				UnitPrice:   amount,
+				Amount:      amount,
+			})
+			subtotal += amount
 			continue
 		}
 		r := projectHours[pid]
@@ -567,8 +592,6 @@ WHERE te.user_id = ? AND te.invoice_id = ?`, userID, invoiceID)
 		projectHours[pid] = r
 	}
 
-	var items []models.InvoiceItem
-	var subtotal float64
 	for _, r := range projectHours {
 		amount := r.Hours * r.Hourly
 		description := utils.FormatServiceType(r.ServiceType)

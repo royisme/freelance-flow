@@ -24,6 +24,10 @@ vi.mock("vue-i18n", () => ({
   }),
 }));
 
+vi.mock("vue-router", () => ({
+  useRouter: () => ({ push: vi.fn(), replace: vi.fn() }),
+}));
+
 describe("Projects view", () => {
   const mockClients: Client[] = [
     { id: 1, name: "Client A", email: "a@example.com", userId: 1, createdAt: "", updatedAt: "" },
@@ -47,7 +51,7 @@ describe("Projects view", () => {
 
     expect(mockApi.projects.list).toHaveBeenCalledTimes(1);
     expect(mockApi.clients.list).toHaveBeenCalledTimes(1);
-    expect(wrapper.text()).toContain("projects.title");
+    expect(wrapper.text()).toContain("projects.addProject");
   });
 
 });

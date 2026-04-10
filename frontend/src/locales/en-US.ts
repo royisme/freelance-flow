@@ -248,6 +248,12 @@ export default {
       project: "Project",
       date: "Date",
       duration: "Duration (Hours)",
+      billingMode: "Billing Mode",
+      billingModes: {
+        hourly: "Hourly",
+        fixed: "Fixed Fee",
+      },
+      manualAmount: "Manual Amount",
       description: "Description",
       descriptionPlaceholder: "What did you work on?",
       timeRange: "Time Range (Optional)",

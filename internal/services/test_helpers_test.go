@@ -75,6 +75,8 @@ func setupFullTestDB(t *testing.T) *sql.DB {
 			description TEXT,
 			billable BOOLEAN DEFAULT 1,
 			invoiced BOOLEAN DEFAULT 0,
+			billing_mode TEXT NOT NULL DEFAULT 'hourly',
+			manual_amount REAL,
 			FOREIGN KEY(user_id) REFERENCES users(id),
 			FOREIGN KEY(project_id) REFERENCES projects(id),
 			FOREIGN KEY(invoice_id) REFERENCES invoices(id)

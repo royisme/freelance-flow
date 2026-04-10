@@ -69,6 +69,7 @@ describe("Timesheet view", () => {
     {
       id: 1,
       projectId: 1,
+      invoiceId: 0,
       description: "Test Entry 1",
       durationSeconds: 3600,
       date: "2025-12-11",
@@ -76,9 +77,8 @@ describe("Timesheet view", () => {
       endTime: "10:00",
       billable: true,
       invoiced: false,
-      userId: 1,
-      createdAt: "",
-      updatedAt: "",
+      billingMode: "hourly",
+      manualAmount: null,
     },
   ];
 
@@ -101,7 +101,8 @@ describe("Timesheet view", () => {
 
     expect(mockApi.timeEntries.list).toHaveBeenCalled();
     expect(mockApi.projects.list).toHaveBeenCalled();
-    expect(wrapper.text()).toContain("timesheet.title");
+    expect(wrapper.text()).toContain("timesheet.entries.title");
+    expect(wrapper.text()).toContain("Test Entry 1");
     expect(wrapper.find('[data-test="quick-entry"]').exists()).toBe(true);
   });
 
@@ -109,6 +110,7 @@ describe("Timesheet view", () => {
     const newEntry: TimeEntry = {
       id: 2,
       projectId: 1,
+      invoiceId: 0,
       description: "Quick Entry",
       durationSeconds: 7200,
       date: "2025-12-11",
@@ -116,9 +118,8 @@ describe("Timesheet view", () => {
       endTime: "",
       billable: true,
       invoiced: false,
-      userId: 1,
-      createdAt: "",
-      updatedAt: "",
+      billingMode: "hourly",
+      manualAmount: null,
     };
     mockApi.timeEntries.create.mockResolvedValueOnce(newEntry);
 
@@ -144,6 +145,8 @@ describe("Timesheet view", () => {
         durationSeconds: 7200,
         billable: true,
         invoiced: false,
+        billingMode: "hourly",
+        manualAmount: null,
       })
     );
   });

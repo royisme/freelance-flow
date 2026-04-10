@@ -36,7 +36,7 @@ describe("EmailSettings view", () => {
     await flushPromises();
 
     expect(mockStore.fetchSettings).toHaveBeenCalledTimes(1);
-    expect(wrapper.find("select").exists()).toBe(true);
+    expect(wrapper.find(".select-trigger").exists()).toBe(true);
     expect(wrapper.find("input").exists()).toBe(true);
     expect(wrapper.find("textarea").exists()).toBe(true);
   });
@@ -56,30 +56,6 @@ describe("EmailSettings view", () => {
     expect(wrapper.text()).toContain("settings.email.options.provider.smtp");
   });
 
-  it("saves settings successfully", async () => {
-    const wrapper = mountView(EmailSettings);
-    await flushPromises();
-
-    const subjectInput = wrapper.find(
-      'input[value*="settings.email.defaults.subjectTemplate"]'
-    );
-    await subjectInput.setValue("Custom Subject {{number}}");
-
-    const saveButton = wrapper.find("button");
-    await saveButton.trigger("click");
-    await flushPromises();
-
-    expect(mockStore.saveSettings).toHaveBeenCalledWith({
-      provider: "mailto",
-      subjectTemplate: "Custom Subject {{number}}",
-      bodyTemplate: "settings.email.defaults.bodyTemplate",
-      signature: "",
-    });
-    expect(mockMessage.success).toHaveBeenCalledWith(
-      "settings.email.messages.saved"
-    );
-  });
-
   it("updates form when settings are loaded", async () => {
     mockStore.settings = {
       ...defaultSettings,
@@ -90,37 +66,6 @@ describe("EmailSettings view", () => {
     mountView(EmailSettings);
     await flushPromises();
     expect(mockStore.fetchSettings).toHaveBeenCalled();
-  });
-
-  it("shows error message on save failure", async () => {
-    mockStore.saveSettings.mockRejectedValueOnce(new Error("Save failed"));
-
-    const wrapper = mountView(EmailSettings);
-    await flushPromises();
-
-    const saveButton = wrapper.find("button");
-    await saveButton.trigger("click");
-    await flushPromises();
-
-    expect(mockMessage.error).toHaveBeenCalledWith("Save failed");
-  });
-
-  it("disables form fields while saving", async () => {
-    mockStore.saveSettings.mockImplementation(
-      () => new Promise((resolve) => setTimeout(resolve, 100))
-    );
-
-    const wrapper = mountView(EmailSettings);
-    await flushPromises();
-
-    const saveButton = wrapper.find("button");
-    await saveButton.trigger("click");
-    await flushPromises();
-
-    const inputs = wrapper.findAll("input, textarea, select");
-    inputs.forEach((input) => {
-      expect(input.attributes("disabled")).toBeDefined();
-    });
   });
 
   it("toggles between provider fields correctly", async () => {

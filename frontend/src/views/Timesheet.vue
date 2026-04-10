@@ -43,6 +43,11 @@ const { t, locale } = useI18n()
 const showModal = ref(false)
 const editingEntry = ref<TimeEntry | null>(null)
 
+function handleCreateEntry() {
+  editingEntry.value = null
+  showModal.value = true
+}
+
 // Helpers
 function formatDate(dateStr: string): string {
   return formatISODateOnlyForLocale(dateStr, locale.value === 'zh-CN' ? 'zh-CN' : 'en-US')
@@ -63,6 +68,15 @@ function getProjectColor(projectId: number): string {
 function getProjectRate(projectId: number): number {
   const project = projects.value.find(p => p.id === projectId)
   return project?.hourlyRate || 0
+}
+
+function getEntryAmount(entry: TimeEntry): number {
+  if (entry.billingMode === 'fixed') {
+    return entry.manualAmount ?? 0
+  }
+  const rate = getProjectRate(entry.projectId)
+  const hours = entry.durationSeconds / 3600
+  return rate * hours
 }
 
 // Entry actions
@@ -109,7 +123,9 @@ async function handleQuickEntry(data: { projectId: number; description: string; 
       startTime: '',
       endTime: '',
       billable: data.billable,
-      invoiced: false
+      invoiced: false,
+      billingMode: 'hourly',
+      manualAmount: null,
     })
   } catch {
     toast.error(t('timesheet.messages.saveError'))
@@ -171,9 +187,7 @@ const columns = computed<ColumnDef<TimeEntry & { project?: { name: string } }>[]
     header: () => h('div', { class: 'text-right' }, t('timesheet.columns.billable')),
     cell: ({ row }) => {
       if (!row.original.billable) return h('span', { class: 'text-muted-foreground block text-right' }, '-')
-      const rate = getProjectRate(row.original.projectId)
-      const hours = row.original.durationSeconds / 3600
-      const amount = (rate * hours).toFixed(2)
+      const amount = getEntryAmount(row.original).toFixed(2)
       return h('span', { class: 'billable-amount block text-right font-medium text-primary' }, `$${amount}`)
     }
   },
@@ -243,10 +257,15 @@ onMounted(() => {
       <!-- Section Header -->
       <div class="shrink-0 flex justify-between items-center mb-2">
         <h3 class="text-lg font-semibold">{{ t('timesheet.entries.title') }}</h3>
-        <Button variant="ghost" size="sm" @click="handleExportCSV">
-          <Download class="w-4 h-4 mr-2" />
-          {{ t('timesheet.entries.exportCSV') }}
-        </Button>
+        <div class="flex items-center gap-2">
+          <Button size="sm" @click="handleCreateEntry">
+            {{ t('timesheet.logTime') }}
+          </Button>
+          <Button variant="ghost" size="sm" @click="handleExportCSV">
+            <Download class="w-4 h-4 mr-2" />
+            {{ t('timesheet.entries.exportCSV') }}
+          </Button>
+        </div>
       </div>
 
       <!-- Quick Entry Bar -->
