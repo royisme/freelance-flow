@@ -299,7 +299,7 @@ export namespace dto {
 	    billable: boolean;
 	    invoiced: boolean;
 	    billingMode: string;
-	    manualAmount?: number | null;
+	    manualAmount?: number;
 	
 	    static createFrom(source: any = {}) {
 	        return new CreateTimeEntryInput(source);
