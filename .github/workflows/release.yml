@@ -30,7 +30,8 @@ jobs:
       - name: Go Lint
         uses: golangci/golangci-lint-action@v4
         with:
-          version: v1.62.2
+          version: v1.64.8
+          install-mode: binary
 
       - name: Go Test
         run: go test ./internal/...
@@ -77,7 +78,8 @@ jobs:
             -clean
 
       - name: Ad-hoc Sign
-        run: codesign --force --deep --sign - build/bin/FreelanceFlow.app
+        run: |
+          security find-identity -v -p codesigning | grep "Developer ID" | head -1 | sed 's/.*"\(.*\)".*/\1/' | xargs -I {} codesign -s {} -f -o runtime build/bin/Tally.app
 
       - name: Create DMG
         run: |
