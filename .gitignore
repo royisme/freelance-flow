@@ -38,3 +38,4 @@ yarn-error.log
 .codex/
 test-results.tldr
 .tldr
+frontend/package.json.md5
