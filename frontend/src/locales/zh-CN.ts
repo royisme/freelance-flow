@@ -693,7 +693,7 @@ export default {
           dark: "深色",
         },
         language: {
-          enUS: "English",
+          enUS: "英文",
           zhCN: "中文（简体）",
         },
         currency: {
@@ -826,7 +826,7 @@ export default {
         subjectTemplate: "主题模板",
         bodyTemplate: "正文模板",
         signature: "签名",
-        resendApiKey: "Resend API Key",
+        resendApiKey: "Resend API 密钥",
         smtpHost: "SMTP 主机",
         smtpPort: "SMTP 端口",
         smtpUsername: "SMTP 用户名",
@@ -836,8 +836,8 @@ export default {
       options: {
         provider: {
           mailto: "Mailto（默认）",
-          resend: "Resend",
-          smtp: "SMTP",
+          resend: "Resend（邮件服务）",
+          smtp: "SMTP（邮件传输协议）",
         },
       },
       defaults: {

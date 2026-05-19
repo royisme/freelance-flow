@@ -6,7 +6,6 @@ import type {
   ModuleRoute,
   ModuleSettingsPage,
 } from "@/modules/types";
-import { financeModule } from "@/modules/finance/module";
 import {
   LayoutDashboard,
   User,
@@ -150,6 +149,19 @@ const baseModules: AppModule[] = [
 ];
 
 // ============================================================================
+// Finance Module - Build-time Exclusion
+// ============================================================================
+// When VITE_FINANCE_MODULE_DISABLED=true, the finance module is excluded at build time.
+// Vite's dead code elimination will remove the unused import branch.
+
+let financeModule: AppModule | null = null;
+if (import.meta.env.VITE_FINANCE_MODULE_DISABLED !== 'true') {
+  // Dynamically imported to enable tree-shaking when disabled
+  const module = await import("@/modules/finance/module");
+  financeModule = module.financeModule;
+}
+
+// ============================================================================
 // Settings Module (Special - Aggregates settings from other modules)
 // ============================================================================
 
@@ -242,7 +254,9 @@ function createSettingsModule(contribPages: ModuleSettingsPage[]): AppModule {
 // Module Registry
 // ============================================================================
 
-const nonSettingsModules: AppModule[] = [...baseModules, financeModule];
+const nonSettingsModules: AppModule[] = financeModule
+  ? [...baseModules, financeModule]
+  : [...baseModules];
 
 export const allModules: AppModule[] = [
   ...nonSettingsModules,

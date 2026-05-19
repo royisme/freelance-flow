@@ -1,83 +1,113 @@
-# Tally
+# Tally - FreelanceFlow
 
-A modern desktop application for freelance management, built with Go (Wails) and Vue 3.
+A desktop application for Canadian freelancers to manage clients, projects, timesheets, and invoices. Built with CRA tax compliance in mind.
 
-## 🚀 Features
+## Features
 
-- **Client Management**: Track client details and history.
-- **Projects**: Manage projects and their status.
-- **Timesheets**: Log work hours.
-- **Invoices**: Generate invoices from timesheets.
-- **Dashboard**: At-a-glance business metrics.
+- **Client Management**: Track client details and project history
+- **Projects**: Manage project lifecycle from start to completion
+- **Timesheets**: Log work hours with billable/non-billable tracking
+- **Invoices**: Generate professional invoices with HST/GST support
+- **Dashboard**: At-a-glance business metrics and summaries
 
-## 🛠️ Tech Stack
+## Tech Stack
 
-- **Backend**: Go (Wails v2)
-- **Frontend**: Vue 3, TypeScript, Shadcn Vue, Tailwind CSS
-- **Runtime**: Bun
-- **State Management**: Pinia
-- **Database**: SQLite (Local persistence)
+| Component | Technology |
+|-----------|------------|
+| Backend | Go (Wails v2) |
+| Frontend | Vue 3, TypeScript |
+| Styling | Tailwind CSS |
+| Runtime | Bun |
+| Database | SQLite |
+| State Management | Pinia |
 
-## 📋 Prerequisites
+## Prerequisites
 
-- **Go**: [Install Go](https://go.dev/doc/install) (1.21+)
-- **Wails**: `go install github.com/wailsapp/wails/v2/cmd/wails@latest`
-- **Bun**: [Install Bun](https://bun.sh/)
+- **Go**: 1.21+ ([Install](https://go.dev/doc/install))
+- **Wails CLI**: `go install github.com/wailsapp/wails/v2/cmd/wails@latest`
+- **Bun**: [Install](https://bun.sh/)
+- **Xcode Command Line Tools**: `xcode-select --install` (macOS only)
 
-## ⚡ Quick Start
-
-1. **Clone the repository**:
-
-   ```bash
-   git clone https://github.com/yourusername/freelance-flow.git
-   cd freelance-flow
-   ```
-
-2. **Install dependencies**:
-
-   ```bash
-   # Frontend dependencies
-   cd frontend
-   bun install
-   cd ..
-   ```
-
-3. **Run in Development Mode**:
-   ```bash
-   wails dev
-   ```
-   This will start the backend and frontend with hot-reload enabled.
-
-## 📦 Build
-
-To build the production application:
+## Quick Start
 
 ```bash
+# Clone and navigate
+git clone https://github.com/yourusername/freelance-flow.git
+cd freelance-flow
+
+# Install frontend dependencies
+cd frontend && bun install && cd ..
+
+# Run in development mode (hot-reload enabled)
+wails dev
+```
+
+The app will open at `http://localhost:34115`.
+
+## Build
+
+```bash
+# Build for your current platform
 wails build
+
+# Build for Windows
+wails build -platform windows/amd64
+
+# Build for macOS
+wails build -platform darwin/universal
 ```
 
-The executable will be generated in the `build/bin` directory.
+Executables are generated in `build/bin/`.
 
-## 📂 Project Structure
+## Canadian Freelancer Setup
 
-- `frontend/`: Vue 3 application source code.
-- `internal/`: Go backend logic (Services, Models, DB).
-- `main.go`: Application entry point and configuration.
-- `wails.json`: Wails project configuration.
+### Registering for HST/GST with CRA
 
-## 💻 Development Setup
+1. **When to register**: If your annual revenue exceeds $30,000, you must register for GST/HST.
+2. **How to register**: Visit [CRA My Business Account](https://www.canada.ca/en/revenue-agency.html) or call 1-800-959-5525.
+3. **After registration**: You'll receive a GST/HST account number (format: RT-XXXX-XXXXXXX).
 
-### Pre-commit Hooks (Recommended)
+### Configuring Tax Settings in Tally
 
-Install pre-commit to automatically check code quality before committing:
+1. Go to **Settings** > **Tax Configuration**
+2. Enter your GST/HST rate (5% GST, 13% HST Ontario, or your provincial rate)
+3. Add your CRA Business Number as the tax ID on invoices
+4. Select whether to include tax in or exclude from quoted prices
+
+### Invoice Formatting for Canadian Standards
+
+Include these elements on all invoices:
+
+- Your business name, address, and phone number
+- Your GST/HST registration number (RT-XXXX-XXXXXXX)
+- Client's complete billing address
+- Invoice number (sequential)
+- Invoice date and due date
+- Description of services
+- Hours, rates, and amounts (subtotal, tax, total)
+- Payment terms
+
+## Project Structure
+
+```
+freelance-flow/
+├── frontend/           # Vue 3 application
+├── internal/           # Go backend (services, models, database)
+├── main.go             # Application entry point
+└── wails.json          # Wails configuration
+```
+
+## Development
 
 ```bash
-# Install pre-commit (macOS)
+# Run with hot-reload
+wails dev
+
+# Pre-commit hooks (recommended)
 brew install pre-commit
-
-# Install hooks
 pre-commit install
-
-# Run checks manually
-pre-commit run --all-files
 ```
+
+## License
+
+MIT

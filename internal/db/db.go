@@ -3,6 +3,7 @@ package db
 
 import (
 	"database/sql"
+	"fmt"
 	"log"
 	"os"
 	"path/filepath"
@@ -184,7 +185,7 @@ func addColumnIfNotExists(db *sql.DB, table, column, columnDef string) {
 		return
 	}
 	if count == 0 {
-		alterQuery := "ALTER TABLE " + table + " ADD COLUMN " + column + " " + columnDef
+		alterQuery := fmt.Sprintf("ALTER TABLE %s ADD COLUMN %s %s", table, column, columnDef)
 		_, err = db.Exec(alterQuery)
 		if err != nil {
 			log.Printf("Error adding %s.%s column: %v", table, column, err)

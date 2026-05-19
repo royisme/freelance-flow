@@ -71,6 +71,7 @@ func main() {
 		fmt.Sprintf(`"version": "%s"`, newVer),
 		1)
 
+	// #nosec G703 -- wails.json is a hardcoded path, not user input
 	if err := os.WriteFile("wails.json", []byte(newContent), 0600); err != nil {
 		panic(err)
 	}

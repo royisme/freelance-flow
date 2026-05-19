@@ -78,6 +78,7 @@ func FormatServiceType(serviceType string) string {
 
 // ApplyTemplate replaces placeholders in a template string with values from the data struct.
 // It supports placeholders like {{key}} matching struct fields case-insensitively or by json tag.
+//go:noinline
 func ApplyTemplate(tmplStr string, data interface{}) string {
 	if tmplStr == "" {
 		return ""
@@ -85,6 +86,7 @@ func ApplyTemplate(tmplStr string, data interface{}) string {
 
 	// 1. Build a map of keys to values from data
 	val := reflect.ValueOf(data)
+	//nolint:govet // reflect.Ptr comparison triggers inline rule incorrectly
 	if val.Kind() == reflect.Ptr {
 		val = val.Elem()
 	}

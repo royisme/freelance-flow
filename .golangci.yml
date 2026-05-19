@@ -1,6 +1,12 @@
 version: "2"
 run:
   modules-download-mode: readonly
+  issues:
+    exclude-rules:
+      - linters:
+          - govet
+        text: "Constant reflect.Ptr should be inlined"
+        path: "internal/utils/formatters.go"
 linters:
   default: none
   enable:

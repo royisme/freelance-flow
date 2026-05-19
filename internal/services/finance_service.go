@@ -1,3 +1,5 @@
+//go:build !FINANCE_MODULE_DISABLED
+
 package services
 
 import (
@@ -183,13 +185,7 @@ func (s *FinanceService) UpdateCategory(userID int, input dto.UpdateCategoryInpu
 		return dto.CategoryOutput{}
 	}
 
-	return dto.CategoryOutput{
-		ID:    input.ID,
-		Name:  input.Name,
-		Type:  input.Type,
-		Color: input.Color,
-		Icon:  input.Icon,
-	}
+	return dto.CategoryOutput(input)
 }
 
 // DeleteCategory deletes a category.
@@ -333,7 +329,7 @@ func (s *FinanceService) ImportTransactions(userID int, input dto.ImportTransact
 	if err != nil {
 		return 0, err
 	}
-	defer tx.Rollback()
+	defer func() { _ = tx.Rollback() }()
 
 	stmt, err := tx.Prepare("INSERT INTO finance_transactions(user_id, account_id, date, description, amount, status, reference_id) VALUES(?, ?, ?, ?, ?, ?, ?)")
 	if err != nil {

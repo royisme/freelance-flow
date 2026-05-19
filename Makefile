@@ -24,6 +24,9 @@ build-darwin-amd64:
 build-darwin-arm64:
 	wails build -platform darwin/arm64 -ldflags "-X freelance-flow/internal/update.CurrentVersion=$$(git describe --tags --always)"
 
+build-darwin-arm64-no-finance:
+	FINANCE_MODULE_DISABLED=1 wails build -platform darwin/arm64 -tags FINANCE_MODULE_DISABLED -ldflags "-X freelance-flow/internal/update.CurrentVersion=$$(git describe --tags --always)"
+
 build-darwin-all: build-darwin-amd64 build-darwin-arm64
 
 release-bump:

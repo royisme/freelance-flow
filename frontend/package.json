@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "bun run typecheck && vite build",
+    "build:no-finance": "VITE_FINANCE_MODULE_DISABLED=true bun run build",
     "preview": "vite preview",
     "test": "mkdir -p .tmp && NODE_OPTIONS=\"--localstorage-file=$(pwd)/.tmp/localstorage.json\" vitest",
     "test:run": "mkdir -p .tmp && NODE_OPTIONS=\"--localstorage-file=$(pwd)/.tmp/localstorage.json\" vitest run",

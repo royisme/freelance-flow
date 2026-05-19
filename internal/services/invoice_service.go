@@ -641,7 +641,7 @@ func (s *InvoiceService) sendViaSMTP(settings dto.InvoiceEmailSettings, toEmail,
 	// Body buffer
 	var msg bytes.Buffer
 	for k, v := range headers {
-		msg.WriteString(fmt.Sprintf("%s: %s\r\n", k, v))
+		fmt.Fprintf(&msg, "%s: %s\r\n", k, v)
 	}
 	msg.WriteString("\r\n")
 
